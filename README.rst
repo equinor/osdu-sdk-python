@@ -1,0 +1,17 @@
+# OSDU SDK for Python
+=====================
+
+This is the OSDU SDK for Python (work in progress).
+
+Usage
+=====
+
+Note: This is currently a WIP so will be subject to breaking changes.
+
+Change Log
+==========
+  
+0.0.1
+-----
+
+- Initial release.

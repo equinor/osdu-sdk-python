@@ -1,0 +1,48 @@
+# Release to PyPi on release creation
+name: Publish to PyPI
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+
+jobs:
+  pypi_release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    # Install package and dependencies
+    - name: Install
+      run: |
+        # Upgrade pip
+        python -m pip install --upgrade pip
+        # Install the package
+        pip install --force-reinstall -e .
+        # Development dependencies
+        pip install --force-reinstall -r requirements.txt
+        # Install additional GitHub actions build dependencies
+        pip install tox-gh-actions setuptools wheel twine
+    
+    # Test with tox - uses tox-gh-actions to map build strategy matrix python-version with tox config.
+    # DO we need to test, or can we rely on testing from elsewhere?
+    # - name: Test with tox
+    #   run: |
+    #     tox
+
+    # Upload to PyPI
+    - name: Build and Upload to PyPI
+      run: |
+        python setup.py sdist bdist_wheel
+        python -m twine upload dist/*
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_KEY }}
+        TWINE_REPOSITORY: pypi    

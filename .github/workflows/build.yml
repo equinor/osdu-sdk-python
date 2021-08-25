@@ -1,0 +1,59 @@
+# Build, lint and test the solution
+# Note: If you make changes here consider if they also need copying to the other build / release scripts.
+name: CI
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: 0 0 * * * # daily
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  
+    strategy:
+      matrix:
+        os:
+          - 'ubuntu-latest'
+          - 'macos-latest'
+          - 'windows-latest'      
+        python-version: 
+          - 3.8
+          - 3.9
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    # Install package and dependencies
+    - name: Install
+      run: |
+        # Upgrade pip
+        python -m pip install --upgrade pip
+        # Install the package
+        pip install --force-reinstall -e .
+        # Development dependencies
+        pip install --force-reinstall -r requirements.txt
+        # Install additional GitHub actions build dependencies
+        pip install tox-gh-actions setuptools wheel twine
+    
+    # Test with tox - uses tox-gh-actions to map build strategy matrix python-version with tox config.
+    - name: Test with tox
+      run: |
+        tox
+    # - name: test
+    #   run: |
+    #     scripts/verify.sh local
+
+  publish_test_pypi:
+    name: Publish to test.pypi.org
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/releases/v') }}
+    steps:
+      - run: echo Test - here we could deploy to test.pypi

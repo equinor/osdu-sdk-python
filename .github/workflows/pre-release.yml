@@ -1,0 +1,101 @@
+# Release to PyPi on tag creation
+name: Publish to Test PyPI
+
+# Notes - do we need to use build matrix test strategy - e.g. can this run if the other fails
+# Set as manual only for now due to the above.
+on:
+  push:
+    tags:
+      - 'releases/v*.*.*'
+  workflow_dispatch:
+
+jobs:
+  test_pypi_release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    # Install package and dependencies
+    - name: Install
+      run: |
+        # Upgrade pip
+        python -m pip install --upgrade pip
+        # Install the package
+        pip install --force-reinstall -e .
+        # Development dependencies
+        pip install --force-reinstall -r requirements.txt
+        # Install additional GitHub actions build dependencies
+        pip install setuptools wheel twine
+    
+    # TEST: ref. https://github.community/t/how-to-get-just-the-tag-name/16241/11
+    - name: Source Version
+      id: source_version
+      run: |
+        ver=`cat src/osdu/__init__.py | grep __VERSION__ | sed s/' '//g | sed s/'__VERSION__='// |  sed s/\"//g`
+        echo $ver
+        echo ::set-output name=SOURCE_VERSION::$ver
+        # echo $ver > $BUILD_STAGINGDIRECTORY/version
+    # TO DO: - compare source and tag version
+    - name: Branch name
+      id: branch_name
+      run: |
+        echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
+        echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+        echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}    
+    - name: Build base image
+      run: |
+        echo $SOURCE_NAME
+        echo $SOURCE_BRANCH
+        echo $SOURCE_TAG
+        echo $SOURCE_VERSION
+        echo $ver
+      env:
+        SOURCE_NAME: ${{ steps.branch_name.outputs.SOURCE_NAME }}
+        SOURCE_BRANCH: ${{ steps.branch_name.outputs.SOURCE_BRANCH }}
+        SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+        SOURCE_VERSION: ${{ steps.source_version.outputs.SOURCE_VERSION }}
+
+    - name: Check if tag version matches project version
+      run: |
+        ver=`cat src/osdu/__init__.py | grep __VERSION__ | sed s/' '//g | sed s/'__VERSION__='// |  sed s/\"//g`
+        tagnumber=${GITHUB_REF#refs/tags/releases}
+        # TAG=$(git describe HEAD --tags --abbrev=0)
+        echo ::set-env name=SOURCE_VERSION::$ver
+        echo ::set-end name=TAG_VERSION::$tagnumber
+        echo $TAG
+        echo $ver
+        echo $tagnumber
+        echo $PROJECT_VERSION
+        # if [[ "$TAG" != "v$PROJECT_VERSION" ]]; then exit 1; fi
+        if [[ "$TAG" != "v$PROJECT_VERSION" ]]; then echo "not equal"; fi
+        if [[ "$TAG" != "$PROJECT_VERSION" ]]; then echo "not equal 2"; fi
+        if [[ "$ver" == "$tagnumber" then echo "equal 3"; fi
+        if [[ "$ver" != "$tagnumber" then echo "not equal 3"; fi
+      env:
+        SOURCE_NAME: ${{ steps.branch_name.outputs.SOURCE_NAME }}
+        SOURCE_BRANCH: ${{ steps.branch_name.outputs.SOURCE_BRANCH }}
+        SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+        SOURCE_VERSION: ${{ steps.source_version.outputs.SOURCE_VERSION }}
+
+    - name: Publish to test.pypi.org
+      # needs: build
+      runs-on: ubuntu-latest
+      if: ${{ startsWith(github.ref, 'refs/tags/releases/v') && env.SOURCE_VERSION == env.TAG_VERSION }}
+      steps:
+        - run: echo Test - here we could deploy to test.pypi
+      
+    # Upload to TestPyPI
+    - name: Build and Upload to TestPyPI
+      run: |
+        python setup.py sdist bdist_wheel
+        python -m twine upload dist/*
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_KEY }}
+        TWINE_REPOSITORY: testpypi
