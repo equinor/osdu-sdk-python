@@ -1,14 +1,16 @@
 # OSDU SDK for Python
 
 [![Build](https://github.com/equinor/osdu-sdk-python/actions/workflows/build.yml/badge.svg)](https://github.com/equinor/osdu-cli/actions/workflows/build.yml)
-[![License](https://img.shields.io/pypi/l/osdu-sdk-python.svg)](https://github.com/equinor/osdu-sdk-python/blob/master/LICENSE)
-[![PyPi Version](https://img.shields.io/pypi/v/osdu-sdk-python.svg?color=informational)](https://pypi.org/project/osdu/)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/osdu-sdk-python.svg?color=informational)](https://pypi.org/project/osdu/)
+[![License](https://img.shields.io/pypi/l/osdu-sdk.svg)](https://github.com/equinor/osdu-sdk-python/blob/master/LICENSE.md)
+[![PyPi Version](https://img.shields.io/pypi/v/osdu-sdk.svg?color=informational)](https://pypi.org/project/osdu/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/osdu-sdk.svg?color=informational)](https://pypi.org/project/osdu-sdk/)
 ![Unknown coverage](https://img.shields.io/badge/coverage-%3F%3F%3F-important)
 
 This is the OSDU SDK for Python (work in progress).
 
-:warning: Note that this is a work in progress and is not complete / might contain bugs.
+:warning: Note that this is a work in progress and is not complete / might contain bugs and might be subject to breaking changes.
+
+Please give your feedback by [raising an issue](#contributing).
 
 ## Installation
 
@@ -16,22 +18,41 @@ Usage requires that you have a valid python 3.8+ installation on your machine. Y
 
 ### Alternative 1 - Deploy from PyPi
 
-For general usage deploying from [PyPi](https://pypi.org/project/osdu/) is the easiest and recommended method.
+For general usage deploying from [PyPi](https://pypi.org/project/osdu-sdk/) is the easiest and recommended method.
 
 ```bash
-pip install osdu
+pip install osdu-sdk
 ```
 
 ### Alternative 2 - Developer setup
 
 For those wanting to modify the code. 
 See the
-[corresponding wiki](https://github.com/equinor/osdu/wiki) for
+[corresponding wiki](https://github.com/equinor/osdu-sdk/wiki) for
 more information.
 
 ## Usage
 
-TODO
+1. Create an instance of OsduTokenCredential, OsduMsalInteractiveCredential, OsduEnvironmentCredential or your own custom class.
+
+```
+credential = OsduMsalInteractiveCredential(client_id, authority, scopes, token_cache)
+```
+
+2. Create a client
+
+```
+client = OsduClient(server, partition, credential)
+```
+
+3. Use the REST interface to call OSDU API's
+
+```
+response = client.get(client.server_url + '/api/search/v2/health/readiness_check')
+print(f"Search service: {response.status_code}\t {response.reason}")
+```
+
+For a full example see [examples/example.py](blob/master/scripts/license_verify.py)
 
 ## Contributing
 
