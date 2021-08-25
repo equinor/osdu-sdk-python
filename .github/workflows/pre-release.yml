@@ -62,12 +62,13 @@ jobs:
         SOURCE_VERSION: ${{ steps.source_version.outputs.SOURCE_VERSION }}
 
     - name: Check if tag version matches project version
+      id: version
       run: |
         ver=`cat src/osdu/__init__.py | grep __VERSION__ | sed s/' '//g | sed s/'__VERSION__='// |  sed s/\"//g`
         tagnumber=${GITHUB_REF#refs/tags/releases}
         # TAG=$(git describe HEAD --tags --abbrev=0)
-        echo ::set-env name=SOURCE_VERSION::$ver
-        echo ::set-end name=TAG_VERSION::$tagnumber
+        echo ::set-output name=SOURCE_VERSION::$ver
+        echo ::set-output name=TAG_VERSION::$tagnumber
         echo $TAG
         echo $ver
         echo $tagnumber
@@ -75,21 +76,27 @@ jobs:
         # if [[ "$TAG" != "v$PROJECT_VERSION" ]]; then exit 1; fi
         if [[ "$TAG" != "v$PROJECT_VERSION" ]]; then echo "not equal"; fi
         if [[ "$TAG" != "$PROJECT_VERSION" ]]; then echo "not equal 2"; fi
-        if [[ "$ver" == "$tagnumber" then echo "equal 3"; fi
-        if [[ "$ver" != "$tagnumber" then echo "not equal 3"; fi
+        if [[ "$ver" == "$tagnumber" ]]; then echo "equal 3"; fi
+        if [[ "$ver" != "$tagnumber" ]]; then echo "not equal 3"; fi
+        if [[ "$ver" == "$tagnumber" ]]; then echo "equal 3"; fi
+
       env:
         SOURCE_NAME: ${{ steps.branch_name.outputs.SOURCE_NAME }}
         SOURCE_BRANCH: ${{ steps.branch_name.outputs.SOURCE_BRANCH }}
         SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
         SOURCE_VERSION: ${{ steps.source_version.outputs.SOURCE_VERSION }}
 
+    # - name: Publish to test.pypi.org
+    #   # needs: build
+    #   runs-on: ubuntu-latest
+    #   if: ${{ startsWith(github.ref, 'refs/tags/releases/v') && env.SOURCE_VERSION == env.TAG_VERSION }}
+    #   run: echo Test - here we could deploy to test.pypi
+
     - name: Publish to test.pypi.org
       # needs: build
-      runs-on: ubuntu-latest
-      if: ${{ startsWith(github.ref, 'refs/tags/releases/v') && env.SOURCE_VERSION == env.TAG_VERSION }}
-      steps:
-        - run: echo Test - here we could deploy to test.pypi
-      
+      if: ${{ startsWith(github.ref, 'refs/tags/releases/v') && steps.version.SOURCE_VERSION == steps.version.TAG_VERSION }}
+      run: echo Test - here we could deploy to test.pypi      
+
     # Upload to TestPyPI
     - name: Build and Upload to TestPyPI
       run: |
