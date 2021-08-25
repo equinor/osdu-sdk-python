@@ -16,20 +16,13 @@ Please give your feedback by [raising an issue](#contributing).
 
 Usage requires that you have a valid python 3.8+ installation on your machine. You might also consider creating a seperate python [virtual environment](https://docs.python.org/3/library/venv.html) for working with OSDU.
 
-### Alternative 1 - Deploy from PyPi
-
 For general usage deploying from [PyPi](https://pypi.org/project/osdu-sdk/) is the easiest and recommended method.
 
 ```bash
 pip install osdu-sdk
 ```
 
-### Alternative 2 - Developer setup
-
-For those wanting to modify the code. 
-See the
-[corresponding wiki](https://github.com/equinor/osdu-sdk/wiki) for
-more information.
+If you want to modify the sdk code then see the [development wiki](https://github.com/equinor/osdu-sdk-python/wiki) for alternative setup steps.
 
 ## Usage
 
@@ -52,7 +45,7 @@ response = client.get(client.server_url + '/api/search/v2/health/readiness_check
 print(f"Search service: {response.status_code}\t {response.reason}")
 ```
 
-For a full example see [examples/example.py](blob/master/scripts/license_verify.py)
+For a full example see [examples/example.py](https://github.com/equinor/osdu-sdk-python/blob/master/examples/example.py)
 
 ## Contributing
 
