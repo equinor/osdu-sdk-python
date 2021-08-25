@@ -29,7 +29,7 @@ __VERSION__ = re.search(r'^__VERSION__\s*=\s*[\'"]([^\'"]*)[\'"]',
                         version_file, re.MULTILINE).group(1)
 
 setup(
-    name='osdu',
+    name='osdu-sdk',
     version=__VERSION__,
     description='OSDU SDK for Python',
     long_description=read('README.rst'),
