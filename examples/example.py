@@ -11,7 +11,7 @@ from os.path import expanduser
 
 from osdu.client import OsduClient
 from osdu.identity import OsduMsalInteractiveCredential
-
+from osdu.search import SearchClient
 
 def main():
     """Example code for calling the osdu search endpoint"""
@@ -29,18 +29,25 @@ def main():
                         'opendes',
                         credential)
 
-    # Check the service status
+    # Direct REST: Check the service status then post json data
     response = client.get(client.server_url + '/api/search/v2/health/readiness_check')
     print(f"Search service: {response.status_code}\t {response.reason}")
 
-    # Use the REST interface to post json data.
     request_data = {
         "kind": "*:*:*:*",
         "limit": 1,
         "query": "*",
         "aggregateBy": "kind"
     }
-    _, response_json = client.post_json_returning_json(client.server_url + '/api/search/v2/query', request_data)
+    response_json = client.post_returning_json(client.server_url + '/api/search/v2/query', request_data)
+    print(json.dumps(response_json, indent=2))
+
+    # Search client: Status then query aggregated
+    search_client = SearchClient(client)
+
+    print(f"Search is Up: {search_client.is_healthy()}")
+
+    response_json = search_client.query_all_aggregated()
     print(json.dumps(response_json, indent=2))
 
 if __name__ == '__main__':

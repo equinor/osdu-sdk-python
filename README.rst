@@ -11,6 +11,11 @@ Note: This is currently a WIP so will be subject to breaking changes.
 Change Log
 ==========
   
+0.0.2
+-----
+
+- Add basic search client
+  
 0.0.1
 -----
 
