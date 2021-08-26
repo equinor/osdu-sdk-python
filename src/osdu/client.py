@@ -5,9 +5,8 @@
 # -----------------------------------------------------------------------------
 """Useful functions."""
 
-import json
 import logging
-from typing import Tuple
+from typing import Tuple, Union
 
 import requests
 
@@ -115,12 +114,12 @@ class OsduClient:
         response = self.get(url)
         return response, response.json()
 
-    def post(self, url: str, data: str) -> requests.Response:
+    def post(self, url: str, data: Union[str, dict]) -> requests.Response:
         """POST data to the specified url
 
         Args:
             url (str): url to POST to
-            data (str): data to send as the body
+            data (Union[str, dict]): json data as string or dict to send as the body
 
         Returns:
             [requests.Response]: response object
@@ -128,35 +127,28 @@ class OsduClient:
         headers = self.get_headers()
         # logger.debug(url)
         # logger.debug(data)
-        response = requests.post(url, data, headers=headers)
+
+        # determine whether to send to requests as data or json
+        _json=None
+        if isinstance(data, dict):
+            _json = data
+            data = None
+
+        response = requests.post(url, data=data, json=_json, headers=headers)
         # logger.debug(response.text)
         return response
 
-    def post_json(self, url: str, json_data: dict) -> requests.Response:
-        """POST json data to a url
+    def post_returning_json(self, url: str, data: Union[str, dict]) -> Tuple[requests.Response, dict]:
+        """Post data to the specified url and get the result in json format.
 
         Args:
             url (str): url to POST to
-            json_data (dict): json to send as the body
-
-        Returns:
-            requests.Response: response object
-        """
-
-        data = json.dumps(json_data)
-        return self.post(url, data)
-
-    def post_json_returning_json(self, url: str, json_data: dict) -> Tuple[requests.Response, dict]:
-        """Post json data to the specified url and get the result in json format.
-
-        Args:
-            url (str): url to POST to
-            json_data (dict): json to send as the body
+            data (Union[str, dict]): json data as string or dict to send as the body
 
         Returns:
             Tuple[requests.Response, dict]: response object, json
         """
-        response = self.post_json(url, json_data)
+        response = self.post(url, data)
         return response, response.json()
 
     def put(self, url: str, filepath: str) -> requests.Response:
