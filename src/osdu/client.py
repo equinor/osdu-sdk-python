@@ -6,9 +6,10 @@
 """Useful functions."""
 
 import logging
-from typing import Tuple, Union
+from typing import Union
 
 import requests
+from requests.models import HTTPError
 
 from osdu.identity import OsduBaseCredential
 
@@ -102,19 +103,29 @@ class OsduClient:
         response = requests.get(url, headers=headers)
         return response
 
-    def get_returning_json(self, url: str) -> Tuple[requests.Response, dict]:
+    def get_returning_json(self, url: str, ok_status_codes: list = None) -> dict:
         """Get data from the specified url in json format.
 
         Args:
             url (str): url to GET from to
+            ok_status_codes (list, optional): Status codes indicating successful call. Defaults to [200].
+
+        Raises:
+            HTTPError: Raised if the get returns a status other than those in ok_status_codes
 
         Returns:
             dict: response json
         """
+        if ok_status_codes is None:
+            ok_status_codes = [200]
         response = self.get(url)
-        return response, response.json()
+        if response.status_code not in ok_status_codes:
+            raise HTTPError(response)
+        return response.json()
 
-    def post(self, url: str, data: Union[str, dict]) -> requests.Response:
+    def post(self,
+             url: str,
+             data: Union[str, dict]) -> requests.Response:
         """POST data to the specified url
 
         Args:
@@ -129,7 +140,7 @@ class OsduClient:
         # logger.debug(data)
 
         # determine whether to send to requests as data or json
-        _json=None
+        _json = None
         if isinstance(data, dict):
             _json = data
             data = None
@@ -138,18 +149,29 @@ class OsduClient:
         # logger.debug(response.text)
         return response
 
-    def post_returning_json(self, url: str, data: Union[str, dict]) -> Tuple[requests.Response, dict]:
+    def post_returning_json(self,
+                            url: str,
+                            data: Union[str, dict],
+                            ok_status_codes: list = None) -> dict:
         """Post data to the specified url and get the result in json format.
 
         Args:
             url (str): url to POST to
             data (Union[str, dict]): json data as string or dict to send as the body
+            ok_status_codes (list, optional): Status codes indicating successful call. Defaults to [200].
+
+        Raises:
+            HTTPError: Raised if the get returns a status other than those in ok_status_codes
 
         Returns:
-            Tuple[requests.Response, dict]: response object, json
+            dict: response json
         """
+        if ok_status_codes is None:
+            ok_status_codes = [200]
         response = self.post(url, data)
-        return response, response.json()
+        if response.status_code not in ok_status_codes:
+            raise HTTPError(response)
+        return response.json()
 
     def put(self, url: str, filepath: str) -> requests.Response:
         """PUT from the file at the given path to a url

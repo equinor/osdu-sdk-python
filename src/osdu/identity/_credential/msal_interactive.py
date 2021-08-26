@@ -96,7 +96,7 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
         # Create a preferably long-lived app instance which maintains a persistant token cache.
         cache = msal.SerializableTokenCache()
         if os.path.exists(self._token_cache):
-            with open(self._token_cache, 'r') as cachefile:
+            with open(self._token_cache, 'r', encoding='utf8') as cachefile:
                 cache.deserialize(cachefile.read())
 
         app = msal.PublicClientApplication(
@@ -135,7 +135,7 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
             )
 
             if cache.has_state_changed:
-                with open(self.token_cache, 'w') as cachefile:
+                with open(self.token_cache, 'w', encoding='utf8') as cachefile:
                     cachefile.write(cache.serialize())
 
         return result
