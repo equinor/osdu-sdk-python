@@ -4,10 +4,8 @@
 # license information.
 # -----------------------------------------------------------------------------
 # pylint: disable=C0114
-from ._credential import OsduBaseCredential
-from ._credential import OsduEnvironmentCredential
-from ._credential import OsduMsalInteractiveCredential
-from ._credential import OsduTokenCredential
+from ._credential import (OsduBaseCredential, OsduEnvironmentCredential,
+                          OsduMsalInteractiveCredential, OsduTokenCredential)
 
 __all__ = [
     "OsduBaseCredential",

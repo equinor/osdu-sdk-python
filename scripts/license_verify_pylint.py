@@ -9,6 +9,7 @@
 from pylint.checkers import BaseChecker
 from pylint.interfaces import IRawChecker
 
+
 class LCAHeaderChecker(BaseChecker):
     """Check that files will always start with the required Equinor ASA
     header"""

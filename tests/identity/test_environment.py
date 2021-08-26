@@ -10,9 +10,10 @@
 import logging
 import os
 from unittest.case import TestCase
-import mock
 
+import mock
 from testfixtures import LogCapture
+
 from osdu.identity import OsduEnvironmentCredential
 from osdu.identity.consts import EnvironmentVariables
 from osdu.identity.exceptions import CredentialUnavailableError

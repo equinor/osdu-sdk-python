@@ -9,6 +9,8 @@ IF %1 == lint CALL :lint_func
 
 IF %1 == test CALL :test_func
 
+IF %1 == format CALL :format_func
+
 EXIT /B 0
 
 :: define function to run linter
@@ -29,6 +31,15 @@ EXIT /B 0
 :test_func
 echo testing
 nose2 -v --with-coverage --coverage src
+EXIT /B 0
+
+:: format
+:format_func
+echo format
+isort src
+isort tests
+isort scripts
+isort examples
 EXIT /B 0
 
 ENDLOCAL

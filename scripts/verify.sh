@@ -12,6 +12,11 @@ function launch_unit_tests()
     nose2 -v --with-coverage --coverage src
 }
 
+function launch_isort()
+{
+    isort $1
+}
+
 if [[ $1 == "local" ]]
     then
         launch_unit_tests && launch_pylint ./src && launch_pylint ./tests && launch_pylint ./scripts/license_verify_pylint && launch_pylint ./scripts/license_verify
@@ -32,4 +37,11 @@ elif [[ $1 == "lint" ]]
         launch_pylint ./scripts/license_verify
         r4=$?
         exit $((r1 + r2 + r3 + r4))
+elif [[ $1 == "format" ]]
+    then
+        echo "isort..."
+        launch_isort ./examples
+        launch_isort ./scripts
+        launch_isort ./src
+        launch_isort ./tests
 fi

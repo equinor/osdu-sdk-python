@@ -10,6 +10,7 @@
 from unittest.case import TestCase
 
 from mock import patch
+
 from osdu.client import OsduClient
 from osdu.identity import OsduTokenCredential
 

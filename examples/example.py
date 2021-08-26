@@ -8,6 +8,7 @@
 
 import json
 from os.path import expanduser
+
 from osdu.client import OsduClient
 from osdu.identity import OsduMsalInteractiveCredential
 

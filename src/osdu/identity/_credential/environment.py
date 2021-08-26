@@ -5,15 +5,15 @@
 # -----------------------------------------------------------------------------
 """Base client for authentication and communicating with OSDU."""
 
-import os
 import logging
-from osdu.identity._credential.msal_interactive import OsduMsalInteractiveCredential
+import os
 
-from osdu.identity._credential.token import OsduTokenCredential
+from osdu.identity.consts import EnvironmentVariables
 from osdu.identity.exceptions import CredentialUnavailableError
 
 from .base import OsduBaseCredential
-from ..consts import EnvironmentVariables
+from .msal_interactive import OsduMsalInteractiveCredential
+from .token import OsduTokenCredential
 
 _logger = logging.getLogger(__name__)
 

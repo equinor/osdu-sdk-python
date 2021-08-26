@@ -8,6 +8,7 @@
 """Test cases for refresh token OSDU client"""
 
 from unittest.case import TestCase
+
 from osdu.identity import OsduMsalInteractiveCredential
 
 

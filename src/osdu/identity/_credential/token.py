@@ -5,9 +5,9 @@
 # -----------------------------------------------------------------------------
 """Base client for authentication and communicating with OSDU."""
 
+import logging
 from datetime import datetime
 from json import loads
-import logging
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
