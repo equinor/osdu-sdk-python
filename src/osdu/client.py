@@ -98,7 +98,6 @@ class OsduClient:
         Returns:
             requests.Response: response object
         """
-        # send batch request for creating records
         headers = self.get_headers()
         response = requests.get(url, headers=headers)
         return response
@@ -120,7 +119,7 @@ class OsduClient:
             ok_status_codes = [200]
         response = self.get(url)
         if response.status_code not in ok_status_codes:
-            raise HTTPError(response)
+            raise HTTPError(response=response)
         return response.json()
 
     def post(self,
@@ -170,7 +169,7 @@ class OsduClient:
             ok_status_codes = [200]
         response = self.post(url, data)
         if response.status_code not in ok_status_codes:
-            raise HTTPError(response)
+            raise HTTPError(response=response)
         return response.json()
 
     def put(self, url: str, filepath: str) -> requests.Response:
@@ -183,7 +182,6 @@ class OsduClient:
         Returns:
             requests.Response: response object
         """
-        # send batch request for creating records
         headers = self.get_headers()
         headers.update({
             "Content-Type": "application/octet-stream",
@@ -192,4 +190,26 @@ class OsduClient:
         with open(filepath, 'rb') as file_handle:
             response = requests.put(url, data=file_handle, headers=headers)
             return response
+
+    def delete(self, url: str, ok_status_codes: list = None) -> requests.Response:
+        """GET to a url
+
+        Args:
+            url (str): url to PUT to
+            ok_status_codes (list, optional): Status codes indicating successful call. Defaults to [200].
+
+        Returns:
+            requests.Response: response object
+        """
+        if ok_status_codes is None:
+            ok_status_codes = [200]
+
+        headers = self.get_headers()
+        response = requests.delete(url, headers=headers)
+
+        if response.status_code not in ok_status_codes:
+            raise HTTPError(response=response)
+
+        return response
+
     # endregion HTTP Actions

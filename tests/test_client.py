@@ -73,7 +73,7 @@ class TestOsduClient(TestCase):
         ([202], 202)
         )
     def test_get_returning_json(self, expected_status_codes, actual_status_code):
-        """Test getting the api path returns expected values"""
+        """Test valid get returns expected values"""
         expected_response_data = {
             "name": "value",
         }
@@ -99,7 +99,7 @@ class TestOsduClient(TestCase):
         ([200, 202], 500)
         )
     def test_get_returning_json_http_error_throws_exception(self, expected_status_codes, actual_status_code):
-        """Test getting the api path returns expected values"""
+        """Test getting causing http error returns expected values"""
         error_response_mock = mock.MagicMock()
         type(error_response_mock).status_code = mock.PropertyMock(return_value=actual_status_code)
         with mock.patch('osdu.client.OsduClient.get', return_value=error_response_mock):
@@ -119,7 +119,7 @@ class TestOsduClient(TestCase):
         ([202], 202)
         )
     def test_post_returning_json(self, expected_status_codes, actual_status_code):
-        """Test getting the api path returns expected values"""
+        """Test valid post returns expected values"""
         input_data = {
             "name": "value",
         }
@@ -146,7 +146,7 @@ class TestOsduClient(TestCase):
         ([200, 202], 500)
         )
     def test_post_returning_json_http_error_throws_exception(self, expected_status_codes, actual_status_code):
-        """Test getting the api path returns expected values"""
+        """Test post error returns expected values"""
         input_data = {
             "name": "value",
         }
@@ -160,6 +160,54 @@ class TestOsduClient(TestCase):
                 else:
                     _ = client.post_returning_json('http://www.test.com/', input_data)
     # endregion test post_returning_json
+
+    # region test delete
+    @params(
+        (None, 200),
+        ([200], 200),
+        ([200, 202], 202),
+        ([202], 202)
+        )
+    @patch.object(OsduClient, 'get_headers', return_value=(None))
+    def test_delete(self, expected_status_codes, actual_status_code, _):
+        """Test valid delete returns expected values"""
+        expected_response_data = {
+            "name": "value",
+        }
+        ok_response_mock = mock.Mock()
+        type(ok_response_mock).status_code = mock.PropertyMock(return_value=actual_status_code)
+        ok_response_mock.json.return_value = expected_response_data
+        with mock.patch('requests.delete', return_value=ok_response_mock) as mock_delete:
+            client = create_dummy_client()
+
+            if expected_status_codes:
+                response = client.delete('http://www.test.com/', expected_status_codes)
+            else:
+                response = client.delete('http://www.test.com/')
+
+            mock_delete.assert_called_once()
+            mock_delete.assert_called_with('http://www.test.com/', headers=None)
+            self.assertEqual(ok_response_mock, response)
+
+    @params(
+        (None, 404),
+        (None, 201),
+        ([200], 404),
+        ([200, 202], 500)
+        )
+    @patch.object(OsduClient, 'get_headers', return_value=(None))
+    def test_delete_http_error_throws_exception(self, expected_status_codes, actual_status_code, _):
+        """Test delete http error returns expected values"""
+        error_response_mock = mock.MagicMock()
+        type(error_response_mock).status_code = mock.PropertyMock(return_value=actual_status_code)
+        with mock.patch('requests.delete', return_value=error_response_mock):
+            with self.assertRaises(HTTPError):
+                client = create_dummy_client()
+                if expected_status_codes:
+                    _ = client.delete('http://www.test.com/', expected_status_codes)
+                else:
+                    _ = client.delete('http://www.test.com/')
+    # endregion test delete
 
 
 if __name__ == '__main__':

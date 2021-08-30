@@ -90,8 +90,6 @@ class TestSearchClient(TestCase):
             "query": "*",
             "aggregateBy": "kind"
         }
-        ok_response_mock = mock.MagicMock()
-        type(ok_response_mock).status_code = mock.PropertyMock(return_value=200)
         with mock.patch('osdu.client.OsduClient.post_returning_json',
                         return_value=expected_response_data) as mock_post_returning_json:
             client = create_dummy_client()

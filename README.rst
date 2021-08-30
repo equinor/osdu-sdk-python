@@ -10,7 +10,13 @@ Note: This is currently a WIP so will be subject to breaking changes.
 
 Change Log
 ==========
-  
+    
+0.0.3
+-----
+
+- Reusable client base
+- Entitlements client
+
 0.0.2
 -----
 
