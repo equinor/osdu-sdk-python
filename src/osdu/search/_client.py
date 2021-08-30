@@ -7,10 +7,13 @@
 
 from typing import Union
 from osdu.client import OsduClient
+from osdu.serviceclientbase import ServiceClientBase
+
+VALID_SEARCH_API_VERSIONS = [2]
 
 
 # pylint: disable=too-few-public-methods
-class SearchClient():
+class SearchClient(ServiceClientBase):
     # Dev. notes:
     # inspiration from:
     # https://github.com/Azure/azure-sdk-for-python/blob/3fe8964c8831c9ce91c4a4bc0dadcbc525b74220/sdk/keyvault/azure-keyvault-keys/azure/keyvault/keys/_client.py
@@ -20,18 +23,6 @@ class SearchClient():
     # TO DO Cursor / paging support.
     """A client for working with the OSDU Search API.
     """
-
-    # versions of the api that we currently support.
-    valid_versions = [2]
-
-    @property
-    def version(self):
-        """Version of the api being used
-
-        Returns:
-            int: Version of the api being used
-        """
-        return self._version
 
     def __init__(self,
                  client: OsduClient,
@@ -45,31 +36,7 @@ class SearchClient():
         Raises:
             ValueError: [description]
         """
-
-        if not client or not isinstance(client, OsduClient):
-            raise ValueError("client should be an OsduClient instance")
-
-        if service_version not in self.valid_versions and service_version != 'latest':
-            raise ValueError(
-                f"This package doesn't support API version '{service_version}'.\n"
-                + f"Supported versions: {', '.join(str(v) for v in self.valid_versions)} or 'latest'")
-
-        self._client = client
-        self._version = self.valid_versions[-1] if service_version == 'latest' else service_version
-
-    def api_url(self, extra_path: str = None):
-        """Get a url for the api including any specified extra path
-
-        Args:
-            extra_path (str, optional): extra path to add to the base url. Defaults to None.
-
-        Returns:
-            str: api url
-        """
-        url = self._client.server_url.rstrip('/') + f"/api/search/v{self.version}/"
-        if extra_path is not None:
-            url = url + extra_path
-        return url
+        super().__init__(client, 'search', VALID_SEARCH_API_VERSIONS, service_version)
 
     # def query():
     #     pass

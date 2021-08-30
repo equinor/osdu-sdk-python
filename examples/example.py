@@ -18,9 +18,9 @@ def main():
 
     # Values needed for msal interactive credentials.
     # See also OsduTokenCredential and OsduEnvironmentCredential for alternatives.
-    client_id = '406cbdb0-ae9a-420b-9861-2c745e845949'
+    client_id = '7a414874-4b27-4378-b34f-bc9e5a5faa4f'
     authority = 'https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0'
-    scopes = '406cbdb0-ae9a-420b-9861-2c745e845949/.default openid'
+    scopes = '7a414874-4b27-4378-b34f-bc9e5a5faa4f/.default openid'
     token_cache = expanduser('~/.osdu-example-token-cache')
     credential = OsduMsalInteractiveCredential(client_id, authority, scopes, token_cache)
 

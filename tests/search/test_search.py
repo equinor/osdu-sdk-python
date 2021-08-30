@@ -14,8 +14,9 @@ from nose2.tools import params
 from requests.models import HTTPError
 
 from osdu.client import OsduClient
-from osdu.identity._credential.token import OsduTokenCredential
+from osdu.identity import OsduTokenCredential
 from osdu.search import SearchClient
+from osdu.search._client import VALID_SEARCH_API_VERSIONS
 
 
 def create_dummy_client(server_url="http://www.test.com"):
@@ -36,69 +37,20 @@ class TestSearchClient(TestCase):
         (2, 2),
         ('latest', 2),
     )
-    def test_init(self, version, expected_version):
-        """Test the init method for token credentials"""
+    def test_init_valid_all_parameters(self, version, expected_version):
+        """Test the init method with valid values for all parameters"""
         client = create_dummy_client()
         search_client = SearchClient(client, version)
 
         self.assertEqual(client, search_client._client)  # pylint: disable=protected-access
-        self.assertEqual(expected_version, search_client.version)
-
-    def test_init_invalid_client(self):
-        """Test the init method for token credentials"""
-
-        with self.assertRaises(ValueError):
-            _ = SearchClient(None)
-
-        with self.assertRaises(ValueError):
-            _ = SearchClient("This is not an OsduClient")
-
-    def test_init_invalid_version(self):
-        """Test the init method for token credentials"""
-        client = create_dummy_client()
-
-        with self.assertRaises(ValueError):
-            _ = SearchClient(client, 0)
-
-        with self.assertRaises(ValueError):
-            _ = SearchClient(client, 9999)
-
-        with self.assertRaises(ValueError):
-            _ = SearchClient(client, "This is not a valid version")
+        self.assertEqual("search", search_client.service_name)
+        self.assertListEqual(VALID_SEARCH_API_VERSIONS, search_client.valid_service_versions)
+        self.assertEqual(expected_version, search_client.service_version)
     # endregion test __init
-
-    # region test api_url
-    @params(
-        ("http://www.test.com", "extra_path", 2),
-        ("http://www.test.com", "extra_path2", 2),
-        ("http://www.test2.com", "extra_path", 2),
-        ("http://www.test2.com/", "extra_path", 2),
-        ("http://www.test2.com/", "extra_path", 'latest'),
-    )
-    def test_api_url(self, server_url, extra_path, version):
-        """Test getting the api path returns expected values"""
-        client = create_dummy_client(server_url)
-        search_client = SearchClient(client, version)
-
-        path = search_client.api_url(extra_path)
-
-        if version == "latest":
-            version = 2
-        self.assertEqual(f"{server_url.rstrip('/')}/api/search/v{version}/{extra_path}", path)
-
-    def test_api_url_no_extra_path(self):
-        """Test getting the api path returns expected values"""
-        client = create_dummy_client()
-        search_client = SearchClient(client)
-
-        path = search_client.api_url()
-
-        self.assertEqual("http://www.test.com/api/search/v2/", path)
-    # endregion test api_url
 
     # region test is_healthy
     def test_is_healthy(self):
-        """Test getting the api path returns expected values"""
+        """Test the is_healthy end point"""
         ok_response_mock = mock.MagicMock()
         type(ok_response_mock).status_code = mock.PropertyMock(return_value=200)
         with mock.patch('osdu.client.OsduClient.get', return_value=ok_response_mock):
@@ -111,7 +63,7 @@ class TestSearchClient(TestCase):
 
     @params(404, 500)
     def test_is_healthy_error(self, status_code):
-        """Test getting the api path returns expected values"""
+        """Test the is_healthy end point returning 404 error"""
         error_response_mock = mock.MagicMock()
         type(error_response_mock).status_code = mock.PropertyMock(return_value=status_code)
         with mock.patch('osdu.client.OsduClient.get', return_value=error_response_mock):
@@ -125,7 +77,7 @@ class TestSearchClient(TestCase):
 
     # region test query_all_aggregated
     def test_query_all_aggregated(self):
-        """Test getting the api path returns expected values"""
+        """Test the query_all_aggregated function"""
         request_data = {
             "kind": "*:*:*:*",
             "limit": 1,
@@ -153,7 +105,7 @@ class TestSearchClient(TestCase):
 
     @mock.patch.object(OsduClient, 'post_returning_json', side_effect=HTTPError(1))
     def test_query_all_aggregated_http_error(self, _):
-        """Test http errors are propogated"""
+        """Test query_all_aggregated http errors are propogated"""
         with self.assertRaises(HTTPError):
             client = create_dummy_client()
             search_client = SearchClient(client)
