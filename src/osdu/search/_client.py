@@ -21,12 +21,9 @@ class SearchClient(ServiceClientBase):
     # TO DO Model, or string / dict based API calls!
     # TO DO Async v non async calls
     # TO DO Cursor / paging support.
-    """A client for working with the OSDU Search API.
-    """
+    """A client for working with the OSDU Search API."""
 
-    def __init__(self,
-                 client: OsduClient,
-                 service_version: Union[int, str] = 'latest'):
+    def __init__(self, client: OsduClient, service_version: Union[int, str] = "latest"):
         """Setup the SearchClient
 
         Args:
@@ -36,7 +33,7 @@ class SearchClient(ServiceClientBase):
         Raises:
             ValueError: [description]
         """
-        super().__init__(client, 'search', VALID_SEARCH_API_VERSIONS, service_version)
+        super().__init__(client, "search", VALID_SEARCH_API_VERSIONS, service_version)
 
     # def query():
     #     pass
@@ -50,7 +47,7 @@ class SearchClient(ServiceClientBase):
         Returns:
             bool: health status of the API
         """
-        response = self._client.get(self.api_url('health/readiness_check'))
+        response = self._client.get(self.api_url("health/readiness_check"))
         return response.status_code == 200
 
     def query_all_aggregated(self) -> dict:
@@ -59,11 +56,23 @@ class SearchClient(ServiceClientBase):
         Returns:
             dict: containing the result
         """
+        request_data = {"kind": "*:*:*:*", "limit": 1, "query": "*", "aggregateBy": "kind"}
+        response_json = self._client.post_returning_json(self.api_url("query"), request_data)
+        return response_json
+
+    def query_by_id(self, identifier: str) -> dict:
+        """Returns a list of all kinds including number of records
+
+        Args:
+            identifier (str): id to query for
+
+        Returns:
+            dict: containing the result
+        """
         request_data = {
             "kind": "*:*:*:*",
-            "limit": 1,
-            "query": "*",
-            "aggregateBy": "kind"
+            "query": f'id:("{identifier}")',
         }
-        response_json = self._client.post_returning_json(self.api_url('query'), request_data)
+
+        response_json = self._client.post_returning_json(self.api_url("query"), request_data)
         return response_json

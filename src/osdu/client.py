@@ -107,7 +107,7 @@ class OsduClient:
 
         Args:
             url (str): url to GET from to
-            ok_status_codes (list, optional): Status codes indicating successful call. Defaults to [200].
+            ok_status_codes (list, optional): Status codes for successful call. Defaults to [200].
 
         Raises:
             HTTPError: Raised if the get returns a status other than those in ok_status_codes
