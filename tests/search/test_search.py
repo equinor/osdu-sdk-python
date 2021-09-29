@@ -112,15 +112,71 @@ class TestSearchClient(TestCase):
 
     # endregion test query_all_aggregated
 
-    # region test query_all_aggregated
+    # region test query
+    @params(
+        ("osdu:wks:dataset--File.Generic:1.0.0", None),
+        ("*:*:*:*", None),
+        (None, None),
+        (None, "opendes:reference-data--ResourceSecurityClassification:RESTRICTED"),
+        ("*:*:*:*", "opendes:reference-data--ResourceSecurityClassification:RESTRICTED"),
+    )
+    def test_query(self, kind, identifier):
+        """Test the query function"""
+        request_data = {}
+
+        if kind is None:
+            request_data["kind"] = "*:*:*:*"
+        else:
+            request_data["kind"] = kind
+
+        if identifier is not None:
+            request_data["query"] = f'id:("{identifier}")'
+
+        # request_data = {
+        #     "kind": request_kind,
+        #     # "query": f'id:("{identifier}")',
+        # }
+        expected_response_data = {
+            "results": [],
+            "totalCount": 1,
+        }
+        with mock.patch(
+            "osdu.client.OsduClient.post_returning_json", return_value=expected_response_data
+        ) as mock_post_returning_json:
+            client = create_dummy_client()
+            search_client = SearchClient(client)
+
+            response_data = search_client.query(kind, identifier)
+
+            mock_post_returning_json.assert_called_once()
+            mock_post_returning_json.assert_called_with(
+                "http://www.test.com/api/search/v2/query", request_data
+            )
+            self.assertEqual(expected_response_data, response_data)
+
+    @mock.patch.object(OsduClient, "post_returning_json", side_effect=HTTPError(1))
+    def test_query_http_error(self, _):
+        """Test query http errors are propogated"""
+        with self.assertRaises(HTTPError):
+            client = create_dummy_client()
+            search_client = SearchClient(client)
+
+            _ = search_client.query("kind")
+
+    # endregion test query
+
+    # region test query_by_id
     @params("id1", "id")
     def test_query_by_id(self, identifier):
-        """Test the query_all_aggregated function"""
+        """Test the query_by_id function"""
         request_data = {
             "kind": "*:*:*:*",
             "query": f'id:("{identifier}")',
         }
-        expected_response_data = {"kind": "*:*:*:*", "limit": 1}
+        expected_response_data = {
+            "results": [],
+            "totalCount": 1,
+        }
         with mock.patch(
             "osdu.client.OsduClient.post_returning_json", return_value=expected_response_data
         ) as mock_post_returning_json:
@@ -137,14 +193,14 @@ class TestSearchClient(TestCase):
 
     @mock.patch.object(OsduClient, "post_returning_json", side_effect=HTTPError(1))
     def test_query_by_id_http_error(self, _):
-        """Test query_all_aggregated http errors are propogated"""
+        """Test query_by_id http errors are propogated"""
         with self.assertRaises(HTTPError):
             client = create_dummy_client()
             search_client = SearchClient(client)
 
             _ = search_client.query_by_id("id")
 
-    # endregion test query_all_aggregated
+    # endregion test query_by_id
 
 
 if __name__ == "__main__":

@@ -60,6 +60,28 @@ class SearchClient(ServiceClientBase):
         response_json = self._client.post_returning_json(self.api_url("query"), request_data)
         return response_json
 
+    def query(self, kind: str = None, identifier: str = None) -> dict:
+        """Query records
+
+        Args:
+            kind (str): kind to query for
+            identifier (str): id to query for
+
+        Returns:
+            dict: containing the result
+        """
+        request_data = {}
+        if kind is None:
+            request_data["kind"] = "*:*:*:*"
+        else:
+            request_data["kind"] = kind
+
+        if identifier is not None:
+            request_data["query"] = f'id:("{identifier}")'
+
+        response_json = self._client.post_returning_json(self.api_url("query"), request_data)
+        return response_json
+
     def query_by_id(self, identifier: str) -> dict:
         """Returns a list of all kinds including number of records
 
