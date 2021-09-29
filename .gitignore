@@ -102,8 +102,8 @@ ENV/
 # mypy
 .mypy_cache/
 
-# VS Code
-.vscode/
+# # VS Code
+# .vscode/
 
 # OS Files
 .DS_Store
