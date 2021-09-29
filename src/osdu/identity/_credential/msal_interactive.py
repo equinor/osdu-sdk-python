@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 class OsduMsalInteractiveCredential(OsduBaseCredential):
-    """Refresh token based client for connecting with OSDU.
-    """
+    """Refresh token based client for connecting with OSDU."""
+
     # __access_token_expire_date = None
     __access_token = None
     # __id_token = None
@@ -57,12 +57,7 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
         return self._token_cache
 
     # pylint: disable=too-many-arguments
-    def __init__(self,
-                 client_id: str,
-                 authority: str,
-                 scopes: str,
-                 token_cache: str = None
-                 ):
+    def __init__(self, client_id: str, authority: str, scopes: str, token_cache: str = None):
         """Setup the new client
 
         Args:
@@ -96,14 +91,12 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
         # Create a preferably long-lived app instance which maintains a persistant token cache.
         cache = msal.SerializableTokenCache()
         if os.path.exists(self._token_cache):
-            with open(self._token_cache, 'r', encoding='utf8') as cachefile:
+            with open(self._token_cache, "r", encoding="utf8") as cachefile:
                 cache.deserialize(cachefile.read())
 
         app = msal.PublicClientApplication(
-            self._client_id,
-            authority=self._authority,
-            token_cache=cache
-            )
+            self._client_id, authority=self._authority, token_cache=cache
+        )
 
         result = None
 
@@ -111,15 +104,17 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
         # accounts = app.get_accounts(username=config.get("username"))
         accounts = app.get_accounts()
         if accounts:
-            logger.info("Account(s) exists in cache, probably with token too. Let's try.")
+            logger.debug("Account(s) exists in cache, probably with token too. Let's try.")
             # for a in accounts:
             #     print(a["username"])
-            chosen = accounts[0]  # Assuming the end user chose this one to proceed - should change if multiple
+            chosen = accounts[
+                0
+            ]  # Assuming the end user chose this one to proceed - should change if multiple
             # Now let's try to find a token in cache for this account
             result = app.acquire_token_silent([self._scopes], account=chosen)
 
         if not result:
-            logger.info("No suitable token exists in cache. Let's get a new one from AAD.")
+            logger.debug("No suitable token exists in cache. Let's get a new one from AAD.")
             print("A local browser window will be open for you to sign in. CTRL+C to cancel.")
             result = app.acquire_token_interactive(
                 [self._scopes],
@@ -131,11 +126,11 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
                 # after already extracting the username from an earlier sign-in
                 # by using the preferred_username claim from returned id_token_claims.
                 # Or simply "select_account" as below - Optional. It forces to show account selector page
-                prompt=msal.Prompt.SELECT_ACCOUNT
+                prompt=msal.Prompt.SELECT_ACCOUNT,
             )
 
             if cache.has_state_changed:
-                with open(self.token_cache, 'w', encoding='utf8') as cachefile:
+                with open(self.token_cache, "w", encoding="utf8") as cachefile:
                     cachefile.write(cache.serialize())
 
         return result
