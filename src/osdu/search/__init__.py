@@ -6,6 +6,4 @@
 # pylint: disable=C0114
 from ._client import SearchClient
 
-__all__ = [
-    "SearchClient"
-]
+__all__ = ["SearchClient"]

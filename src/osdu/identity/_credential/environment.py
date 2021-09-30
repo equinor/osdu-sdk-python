@@ -48,35 +48,48 @@ class OsduEnvironmentCredential(OsduBaseCredential):
         self._prefix = prefix
         self._credential = None
 
-        if all(os.environ.get(self._expand_environment_name(v)) is not None for v in EnvironmentVariables.TOKEN_VARS):
+        if all(
+            os.environ.get(self._expand_environment_name(v)) is not None
+            for v in EnvironmentVariables.TOKEN_VARS
+        ):
             self._credential = OsduTokenCredential(
                 client_id=os.environ[self._expand_environment_name(EnvironmentVariables.CLIENT_ID)],
-                token_endpoint=os.environ[self._expand_environment_name(EnvironmentVariables.TOKEN_ENDPOINT)],
-                refresh_token=os.environ[self._expand_environment_name(EnvironmentVariables.REFRESH_TOKEN)],
-                client_secret=os.environ[self._expand_environment_name(EnvironmentVariables.CLIENT_SECRET)],
-                **kwargs
+                token_endpoint=os.environ[
+                    self._expand_environment_name(EnvironmentVariables.TOKEN_ENDPOINT)
+                ],
+                refresh_token=os.environ[
+                    self._expand_environment_name(EnvironmentVariables.REFRESH_TOKEN)
+                ],
+                client_secret=os.environ[
+                    self._expand_environment_name(EnvironmentVariables.CLIENT_SECRET)
+                ],
+                **kwargs,
             )
-        elif all(os.environ.get(self._expand_environment_name(v)) is not None
-                 for v in EnvironmentVariables.MSAL_INTERACTIVE_VARS):
+        elif all(
+            os.environ.get(self._expand_environment_name(v)) is not None
+            for v in EnvironmentVariables.MSAL_INTERACTIVE_VARS
+        ):
             self._credential = OsduMsalInteractiveCredential(
                 client_id=os.environ[self._expand_environment_name(EnvironmentVariables.CLIENT_ID)],
                 authority=os.environ[self._expand_environment_name(EnvironmentVariables.AUTHORITY)],
                 scopes=os.environ[self._expand_environment_name(EnvironmentVariables.SCOPES)],
-                token_cache=os.environ.get(self._expand_environment_name(EnvironmentVariables.TOKEN_CACHE)),
-                **kwargs
+                token_cache=os.environ.get(
+                    self._expand_environment_name(EnvironmentVariables.TOKEN_CACHE)
+                ),
+                **kwargs,
             )
 
         if self._credential:
             _logger.info("Environment is configured for %s", self._credential.__class__.__name__)
         else:
             expected_variables = set(
-                EnvironmentVariables.TOKEN_VARS
-                + EnvironmentVariables.MSAL_INTERACTIVE_VARS
+                EnvironmentVariables.TOKEN_VARS + EnvironmentVariables.MSAL_INTERACTIVE_VARS
             )
             set_variables = [v for v in expected_variables if v in os.environ]
             if set_variables:
                 _logger.warning(
-                    "Incomplete environment configuration. These variables are set: %s", ", ".join(set_variables)
+                    "Incomplete environment configuration. These variables are set: %s",
+                    ", ".join(set_variables),
                 )
             else:
                 _logger.warning("No environment configuration found.")
@@ -88,8 +101,6 @@ class OsduEnvironmentCredential(OsduBaseCredential):
         """Get token, deferring to the relevant credential class"""
 
         if not self._credential:
-            message = (
-                "OsduEnvironmentCredential authentication unavailable. Environment variables are not fully configured."
-            )
+            message = "OsduEnvironmentCredential unavailable. Environment variables are not fully configured."
             raise CredentialUnavailableError(message=message)
         return self._credential.get_token(**kwargs)

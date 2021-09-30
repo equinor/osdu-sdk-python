@@ -6,6 +6,4 @@
 # pylint: disable=C0114
 from ._client import EntitlementsClient
 
-__all__ = [
-    "EntitlementsClient"
-]
+__all__ = ["EntitlementsClient"]

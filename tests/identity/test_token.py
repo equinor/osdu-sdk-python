@@ -17,10 +17,10 @@ class TestTokenOsduClient(TestCase):
 
     def test_init(self):
         """Test the init method"""
-        client_id = 'client_id'
-        token_endpoint = 'token_endpoint'
-        refresh_token = 'refresh_token'
-        client_secret = 'client_secret'
+        client_id = "client_id"
+        token_endpoint = "token_endpoint"
+        refresh_token = "refresh_token"
+        client_secret = "client_secret"
 
         # pylint: disable=too-many-function-args
         client = OsduTokenCredential(client_id, token_endpoint, refresh_token, client_secret)
@@ -50,6 +50,7 @@ class TestTokenOsduClient(TestCase):
     #     self.assertEqual(returned_access_token, access_token)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import nose2
+
     nose2.main()

@@ -17,10 +17,10 @@ class TestOsduMsalInteractiveIdentity(TestCase):
 
     def test_init(self):
         """Test the init method"""
-        client_id = 'client_id'
-        authority = 'authority'
-        scopes = 'scopes'
-        token_cache = '.'
+        client_id = "client_id"
+        authority = "authority"
+        scopes = "scopes"
+        token_cache = "."
 
         # pylint: disable=too-many-function-args
         client = OsduMsalInteractiveCredential(client_id, authority, scopes, token_cache)
@@ -51,6 +51,7 @@ class TestOsduMsalInteractiveIdentity(TestCase):
     #     self.assertEqual(returned_access_token, access_token)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import nose2
+
     nose2.main()

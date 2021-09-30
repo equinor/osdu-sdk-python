@@ -35,11 +35,22 @@ EXIT /B 0
 
 :: format
 :format_func
-echo format
-isort src
-isort tests
-isort scripts
-isort examples
+echo isort src
+isort src --profile black
+echo isort tests
+isort tests --profile black
+echo isort scripts
+isort tests --profile black
+echo isort examples
+isort tests --profile black
+echo black src
+black src --line-length 100
+echo black tests
+black tests --line-length 100
+echo black scripts
+black tests --line-length 100
+echo black examples
+black tests --line-length 100
 EXIT /B 0
 
 ENDLOCAL

@@ -35,7 +35,7 @@ class TestOsduEnvironmentCredential(TestCase):
             with LogCapture(level=logging.INFO) as log_capture:
                 client = OsduEnvironmentCredential()
                 # pylint: disable=protected-access
-                self.assertEqual('OsduTokenCredential', client._credential.__class__.__name__)
+                self.assertEqual("OsduTokenCredential", client._credential.__class__.__name__)
                 self.assertEqual(len(log_capture.records), 1)
 
     def test_init_msal(self):
@@ -43,14 +43,16 @@ class TestOsduEnvironmentCredential(TestCase):
         envs = {
             EnvironmentVariables.CLIENT_ID: "CLIENT_ID",
             EnvironmentVariables.AUTHORITY: "AUTHORITY",
-            EnvironmentVariables.SCOPES: "SCOPES"
+            EnvironmentVariables.SCOPES: "SCOPES",
         }
 
         with mock.patch.dict(os.environ, envs, clear=True):
             with LogCapture(level=logging.INFO) as log_capture:
                 client = OsduEnvironmentCredential()
                 # pylint: disable=protected-access
-                self.assertEqual('OsduMsalInteractiveCredential', client._credential.__class__.__name__)
+                self.assertEqual(
+                    "OsduMsalInteractiveCredential", client._credential.__class__.__name__
+                )
                 self.assertEqual(len(log_capture.records), 1)
 
     def test_init_msal_optional(self):
@@ -65,8 +67,8 @@ class TestOsduEnvironmentCredential(TestCase):
         with mock.patch.dict(os.environ, envs, clear=True):
             client = OsduEnvironmentCredential()
             # pylint: disable=protected-access
-            self.assertEqual('OsduMsalInteractiveCredential', client._credential.__class__.__name__)
-            self.assertEqual('TOKEN_CACHE', client._credential.token_cache)
+            self.assertEqual("OsduMsalInteractiveCredential", client._credential.__class__.__name__)
+            self.assertEqual("TOKEN_CACHE", client._credential.token_cache)
 
     def test_init_invalid(self):
         """Test incomplete setup doesn't assign any credentials."""
@@ -89,6 +91,7 @@ class TestOsduEnvironmentCredential(TestCase):
                 client.get_token()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import nose2
+
     nose2.main()

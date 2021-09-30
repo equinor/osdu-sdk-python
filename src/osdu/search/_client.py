@@ -6,6 +6,7 @@
 """Search client for working with the OSDU search API."""
 
 from typing import Union
+
 from osdu.client import OsduClient
 from osdu.serviceclientbase import ServiceClientBase
 

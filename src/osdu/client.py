@@ -57,12 +57,13 @@ class OsduClient:
         """
         return self._retries
 
-    def __init__(self,
-                 server_url: str,
-                 data_partition: str,
-                 credentials: OsduBaseCredential,
-                 retries: int = 0,
-                 ):
+    def __init__(
+        self,
+        server_url: str,
+        data_partition: str,
+        credentials: OsduBaseCredential,
+        retries: int = 0,
+    ):
         """Setup the new client
 
         Args:
@@ -122,9 +123,7 @@ class OsduClient:
             raise HTTPError(response=response)
         return response.json()
 
-    def post(self,
-             url: str,
-             data: Union[str, dict]) -> requests.Response:
+    def post(self, url: str, data: Union[str, dict]) -> requests.Response:
         """POST data to the specified url
 
         Args:
@@ -148,10 +147,9 @@ class OsduClient:
         # logger.debug(response.text)
         return response
 
-    def post_returning_json(self,
-                            url: str,
-                            data: Union[str, dict],
-                            ok_status_codes: list = None) -> dict:
+    def post_returning_json(
+        self, url: str, data: Union[str, dict], ok_status_codes: list = None
+    ) -> dict:
         """Post data to the specified url and get the result in json format.
 
         Args:
@@ -183,11 +181,8 @@ class OsduClient:
             requests.Response: response object
         """
         headers = self.get_headers()
-        headers.update({
-            "Content-Type": "application/octet-stream",
-            "x-ms-blob-type": "BlockBlob"
-        })
-        with open(filepath, 'rb') as file_handle:
+        headers.update({"Content-Type": "application/octet-stream", "x-ms-blob-type": "BlockBlob"})
+        with open(filepath, "rb") as file_handle:
             response = requests.put(url, data=file_handle, headers=headers)
             return response
 

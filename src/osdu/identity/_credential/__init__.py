@@ -13,5 +13,5 @@ __all__ = [
     "OsduBaseCredential",
     "OsduEnvironmentCredential",
     "OsduTokenCredential",
-    "OsduMsalInteractiveCredential"
+    "OsduMsalInteractiveCredential",
 ]

@@ -6,10 +6,11 @@
 """Base client for working with the OSDU file API."""
 
 from typing import Union
+
 from osdu.client import OsduClient
 
 
-class ServiceClientBase():
+class ServiceClientBase:
     """Abstract base service client class for connecting with OSDU.
     It is not intended to use this directly, rather one of it's subclasses.
     """
@@ -42,11 +43,13 @@ class ServiceClientBase():
         """
         return self._service_version
 
-    def __init__(self,
-                 client: OsduClient,
-                 service_name: str,
-                 valid_service_versions: list,
-                 service_version: Union[int, str] = 'latest'):
+    def __init__(
+        self,
+        client: OsduClient,
+        service_name: str,
+        valid_service_versions: list,
+        service_version: Union[int, str] = "latest",
+    ):
         """Setup the ServiceClientBase
 
         Args:
@@ -62,15 +65,18 @@ class ServiceClientBase():
         if not client or not isinstance(client, OsduClient):
             raise ValueError("client should be an OsduClient instance")
 
-        if service_version not in valid_service_versions and service_version != 'latest':
+        if service_version not in valid_service_versions and service_version != "latest":
             raise ValueError(
                 f"This package doesn't support API version '{service_version}'.\n"
-                + f"Supported versions: {', '.join(str(v) for v in valid_service_versions)} or 'latest'")
+                + f"Supported versions: {', '.join(str(v) for v in valid_service_versions)} or 'latest'"
+            )
 
         self._client = client
         self._service_name = service_name
         self._valid_service_versions = valid_service_versions
-        self._service_version = self.valid_service_versions[-1] if service_version == 'latest' else service_version
+        self._service_version = (
+            self.valid_service_versions[-1] if service_version == "latest" else service_version
+        )
 
     def api_url(self, extra_path: str = None):
         """Get a url for the api including any specified extra path
@@ -81,7 +87,10 @@ class ServiceClientBase():
         Returns:
             str: api url
         """
-        url = self._client.server_url.rstrip('/') + f"/api/{self.service_name}/v{self.service_version}/"
+        url = (
+            self._client.server_url.rstrip("/")
+            + f"/api/{self.service_name}/v{self.service_version}/"
+        )
         if extra_path is not None:
             url = url + extra_path
         return url

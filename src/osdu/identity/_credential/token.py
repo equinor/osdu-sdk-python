@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 
 
 class OsduTokenCredential(OsduBaseCredential):
-    """Refresh token based client for connecting with OSDU.
-    """
+    """Refresh token based client for connecting with OSDU."""
+
     __access_token_expire_date = 0
     __access_token = None
     # __id_token = None
@@ -61,12 +61,13 @@ class OsduTokenCredential(OsduBaseCredential):
         return self._client_secret
 
     # pylint: disable=too-many-arguments
-    def __init__(self,
-                 client_id: str,
-                 token_endpoint: str,
-                 refresh_token: str,
-                 client_secret: str,
-                 ):
+    def __init__(
+        self,
+        client_id: str,
+        token_endpoint: str,
+        refresh_token: str,
+        client_secret: str,
+    ):
         """Setup the new client
 
         Args:
@@ -101,9 +102,7 @@ class OsduTokenCredential(OsduBaseCredential):
             "client_id": self._client_id,
             "client_secret": self._client_secret,
         }
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
         data = urlencode(body).encode("utf8")
         request = Request(url=self._token_endpoint, data=data, headers=headers)
         try:
