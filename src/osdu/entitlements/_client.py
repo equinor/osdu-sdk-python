@@ -90,19 +90,20 @@ class EntitlementsClient(ServiceClientBase):
         """
         _ = self._client.delete(self.api_url(f'groups/{group}'), [200, 204])
 
-    def add_member_to_group(self, member: str, group: str) -> dict:
+    def add_member_to_group(self, member: str, group: str, role: str) -> dict:
         """Add member to group
 
         Args:
             member (str): The email of the member to be added.
             group (str): The email of the group.
+            role (str): The role in the group.
 
         Returns:
             dict: containing the result
         """
         request_data = {
             "email": member,
-            "role": "MEMBER",
+            "role": role,
         }
         response_json = self._client.post_returning_json(self.api_url(f'groups/{group}/members'),
                                                          request_data)

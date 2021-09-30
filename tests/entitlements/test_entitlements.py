@@ -199,14 +199,15 @@ class TestEntitlementsClient(TestCase):
 
     # region test add_member_to_group
     @params(
-        ("member1@asdf.com", "group1@asdf.com"),
-        ("member2@asdf.com", "group2@asdf.com"),
+        ("member1@asdf.com", "group1@asdf.com", "MEMBER"),
+        ("member2@asdf.com", "group2@asdf.com", "MEMBER"),
+        ("member2@asdf.com", "group2@asdf.com", "OWNER"),
         )
-    def test_add_member_to_group(self, member, group):
+    def test_add_member_to_group(self, member, group, role):
         """Test valid call returns expected values"""
         request_data = {
             "email": member,
-            "role": "MEMBER"
+            "role": role
         }
         expected_response_data = {
             "query": "*",
@@ -217,7 +218,7 @@ class TestEntitlementsClient(TestCase):
             client = create_dummy_client()
             entitlements_client = EntitlementsClient(client)
 
-            response_data = entitlements_client.add_member_to_group(member, group)
+            response_data = entitlements_client.add_member_to_group(member, group, role)
 
             mock_post_returning_json.assert_called_once()
             mock_post_returning_json.assert_called_with(
@@ -231,7 +232,7 @@ class TestEntitlementsClient(TestCase):
             client = create_dummy_client()
             entitlements_client = EntitlementsClient(client)
 
-            _ = entitlements_client.add_member_to_group("member1@asdf.com", "group1@asdf.com")
+            _ = entitlements_client.add_member_to_group("member1@asdf.com", "group1@asdf.com", "MEMBER")
     # endregion test add_member_to_group
 
 
