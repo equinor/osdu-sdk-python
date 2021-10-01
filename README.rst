@@ -10,7 +10,13 @@ Note: This is currently a WIP so will be subject to breaking changes.
 
 Change Log
 ==========
-      
+       
+0.0.6
+-----
+
+- entitlements add_member_to_group role parameter
+- added entitlements remove_member_from_group function
+ 
 0.0.5
 -----
 

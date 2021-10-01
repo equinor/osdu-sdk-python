@@ -16,13 +16,13 @@ class LCAHeaderChecker(BaseChecker):
 
     __implements__ = IRawChecker
 
-    name = 'equinor-header'
+    name = "equinor-header"
     priority = -1
     msgs = {
-        'W5001': (
-            'Missing copyright header',
-            'missing-equinor-header',
-            'All source files should contain Equinor copyright header.'
+        "W5001": (
+            "Missing copyright header",
+            "missing-equinor-header",
+            "All source files should contain Equinor copyright header.",
         ),
     }
     options = ()
@@ -32,22 +32,22 @@ class LCAHeaderChecker(BaseChecker):
         the module's content is accessible via node.stream() function
         """
 
-        legal_copyright = ('Copyright (c) Equinor ASA. '
-                           'All rights reserved.')
+        legal_copyright = "Copyright (c) Equinor ASA. All rights reserved."
 
         with node.stream() as stream:
             for line in stream:
                 if isinstance(line, bytes):
                     # Assume UTF-8 for simplicity
-                    line = line.decode('utf-8')
-                if line.lstrip().startswith('#'):
+                    line = line.decode("utf-8")
+                if line.lstrip().startswith("#"):
                     if legal_copyright in line:
                         return
                 elif not line.lstrip():
                     continue
                 else:
-                    self.add_message('missing-equinor-header', line=0)
+                    self.add_message("missing-equinor-header", line=0)
                     return
+
 
 def register(linter):
     """required method to auto register this checker"""

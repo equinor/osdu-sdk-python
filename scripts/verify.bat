@@ -48,9 +48,9 @@ black src --line-length 100
 echo black tests
 black tests --line-length 100
 echo black scripts
-black tests --line-length 100
+black scripts --line-length 100
 echo black examples
-black tests --line-length 100
+black examples --line-length 100
 EXIT /B 0
 
 ENDLOCAL

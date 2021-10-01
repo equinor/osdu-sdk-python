@@ -10,7 +10,7 @@
 import os
 import sys
 
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
 
 PY_LICENSE_HEADER = """# -----------------------------------------------------------------------------
 # Copyright (c) Equinor ASA. All rights reserved.
@@ -20,8 +20,8 @@ PY_LICENSE_HEADER = """# -------------------------------------------------------
 """
 
 env_folders = [
-    os.path.join(ROOT_DIR, '.env'),
-    os.path.join(ROOT_DIR, '.tox'),
+    os.path.join(ROOT_DIR, ".env"),
+    os.path.join(ROOT_DIR, ".tox"),
 ]
 
 
@@ -39,9 +39,9 @@ def get_files_without_header():
             continue
 
         for a_file in files:
-            if a_file.endswith('.py'):
+            if a_file.endswith(".py"):
                 cur_file_path = os.path.join(current_dir, a_file)
-                with open(cur_file_path, 'r', encoding='UTF-8') as file:
+                with open(cur_file_path, "r", encoding="UTF-8") as file:
                     file_text = file.read()
 
                 if len(file_text) > 0 and not contains_header(file_text):
@@ -54,13 +54,18 @@ def main():
     files_without_header = [file_path for file_path, _ in get_files_without_header()]
 
     if files_without_header:
-        print("Error: The following files don't have the required license headers:", file=sys.stderr)
-        print('\n'.join(files_without_header), file=sys.stderr)
-        print("Error: {} file(s) found without license headers.".format(len(files_without_header)), file=sys.stderr)
+        print(
+            "Error: The following files don't have the required license headers:", file=sys.stderr
+        )
+        print("\n".join(files_without_header), file=sys.stderr)
+        print(
+            "Error: {} file(s) found without license headers.".format(len(files_without_header)),
+            file=sys.stderr,
+        )
         sys.exit(1)
     else:
         pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
