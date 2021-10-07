@@ -10,6 +10,7 @@
 from unittest.case import TestCase
 
 import mock
+import requests
 from mock import patch
 from nose2.tools import params
 from requests.models import HTTPError
@@ -30,6 +31,11 @@ def create_dummy_client(server_url="http://www.test.com"):
 
 class TestOsduClient(TestCase):
     """Test cases for base OSDU client"""
+
+    dummy_headers = {"headers": "value"}
+    sample_json = {
+        "name": "value",
+    }
 
     def test_init(self):
         """Test the init method"""
@@ -64,6 +70,26 @@ class TestOsduClient(TestCase):
         headers = client.get_headers()
 
         self.assertDictEqual(expected_headers, headers)
+
+    # region test get
+    @params(
+        "http://www.test.com/",
+        "http://www.test.com/test2/",
+    )
+    @patch.object(OsduClient, "get_headers", return_value=dummy_headers)
+    def test_get(self, url, _):
+        """Test valid get returns expected values"""
+        response_mock = mock.Mock()
+        with mock.patch.object(requests, "get", return_value=response_mock) as mock_get:
+            client = create_dummy_client()
+
+            response = client.get(url)
+
+            mock_get.assert_called_once()
+            mock_get.assert_called_with(url, headers=self.dummy_headers)
+            self.assertEqual(response_mock, response)
+
+    # endregion test get
 
     # region test get_returning_json
     @params((None, 200), ([200], 200), ([200, 202], 202), ([202], 202))
@@ -104,9 +130,56 @@ class TestOsduClient(TestCase):
 
     # endregion test get_returning_json
 
+    # region test post
+    @params(
+        "string1",
+        "string2",
+    )
+    @patch.object(OsduClient, "get_headers", return_value=dummy_headers)
+    def test_post_string(self, string_data, _):
+        """Test valid post with string returns expected values"""
+        response_mock = mock.Mock()
+        with mock.patch.object(requests, "post", return_value=response_mock) as mock_post:
+            client = create_dummy_client()
+
+            response = client.post("http://www.test.com/", string_data)
+
+            mock_post.assert_called_once()
+            mock_post.assert_called_with(
+                "http://www.test.com/", data=string_data, json=None, headers=self.dummy_headers
+            )
+            self.assertEqual(response_mock, response)
+
+    @params(
+        {"name": "value"},
+        {"name2": "value2"},
+    )
+    @patch.object(OsduClient, "get_headers", return_value=dummy_headers)
+    def test_post_json(self, json, _):
+        """Test valid post with json returns expected values"""
+        response_mock = mock.Mock()
+        with mock.patch.object(requests, "post", return_value=response_mock) as mock_post:
+            client = create_dummy_client()
+
+            response = client.post("http://www.test.com/", json)
+
+            mock_post.assert_called_once()
+            mock_post.assert_called_with(
+                "http://www.test.com/", data=None, json=json, headers=self.dummy_headers
+            )
+            self.assertEqual(response_mock, response)
+
+    # endregion test post
+
     # region test post_returning_json
-    @params((None, 200), ([200], 200), ([200, 202], 202), ([202], 202))
-    def test_post_returning_json(self, expected_status_codes, actual_status_code):
+
+    @params(
+        (None, 200),
+        ([200], 200),
+        ([200, 202], 202),
+        ([202], 202),
+    )
+    def test_post_returning_json_status_codes(self, expected_status_codes, actual_status_code):
         """Test valid post returns expected values"""
         input_data = {
             "name": "value",
@@ -150,6 +223,100 @@ class TestOsduClient(TestCase):
                     _ = client.post_returning_json("http://www.test.com/", input_data)
 
     # endregion test post_returning_json
+
+    # region test put
+    @params(
+        "string1",
+        "string2",
+    )
+    @patch.object(OsduClient, "get_headers", return_value=dummy_headers)
+    def test_put_string(self, string_data, _):
+        """Test valid put with string returns expected values"""
+        response_mock = mock.Mock()
+        with mock.patch.object(requests, "put", return_value=response_mock) as mock_put:
+            client = create_dummy_client()
+
+            response = client.put("http://www.test.com/", string_data)
+
+            mock_put.assert_called_once()
+            mock_put.assert_called_with(
+                "http://www.test.com/", data=string_data, json=None, headers=self.dummy_headers
+            )
+            self.assertEqual(response_mock, response)
+
+    @params(
+        {"name": "value"},
+        {"name2": "value2"},
+    )
+    @patch.object(OsduClient, "get_headers", return_value=dummy_headers)
+    def test_put_json(self, json, _):
+        """Test valid put with json returns expected values"""
+        response_mock = mock.Mock()
+        with mock.patch.object(requests, "put", return_value=response_mock) as mock_put:
+            client = create_dummy_client()
+
+            response = client.put("http://www.test.com/", json)
+
+            mock_put.assert_called_once()
+            mock_put.assert_called_with(
+                "http://www.test.com/", data=None, json=json, headers=self.dummy_headers
+            )
+            self.assertEqual(response_mock, response)
+
+    # endregion test put
+
+    # region test put_returning_json
+
+    @params(
+        (None, 200),
+        ([200], 200),
+        ([200, 202], 202),
+        ([202], 202),
+    )
+    def test_put_returning_json_status_codes(self, expected_status_codes, actual_status_code):
+        """Test valid put returns expected values"""
+        input_data = {
+            "name": "value",
+        }
+        expected_response_data = input_data
+        ok_response_mock = mock.Mock()
+        type(ok_response_mock).status_code = mock.PropertyMock(return_value=actual_status_code)
+        ok_response_mock.json.return_value = expected_response_data
+        with mock.patch("osdu.client.OsduClient.put", return_value=ok_response_mock) as mock_get:
+            client = create_dummy_client()
+
+            if expected_status_codes:
+                response = client.put_returning_json(
+                    "http://www.test.com/", input_data, expected_status_codes
+                )
+            else:
+                response = client.put_returning_json("http://www.test.com/", input_data)
+
+            mock_get.assert_called_once()
+            mock_get.assert_called_with("http://www.test.com/", input_data)
+            self.assertDictEqual(expected_response_data, response)
+
+    @params((None, 404), (None, 201), ([200], 404), ([200, 202], 500))
+    def test_put_returning_json_http_error_throws_exception(
+        self, expected_status_codes, actual_status_code
+    ):
+        """Test put error returns expected values"""
+        input_data = {
+            "name": "value",
+        }
+        error_response_mock = mock.MagicMock()
+        type(error_response_mock).status_code = mock.PropertyMock(return_value=actual_status_code)
+        with mock.patch("osdu.client.OsduClient.put", return_value=error_response_mock):
+            with self.assertRaises(HTTPError):
+                client = create_dummy_client()
+                if expected_status_codes:
+                    _ = client.put_returning_json(
+                        "http://www.test.com/", input_data, expected_status_codes
+                    )
+                else:
+                    _ = client.put_returning_json("http://www.test.com/", input_data)
+
+    # endregion test put_returning_json
 
     # region test delete
     @params((None, 200), ([200], 200), ([200, 202], 202), ([202], 202))

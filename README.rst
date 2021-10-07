@@ -10,7 +10,12 @@ Note: This is currently a WIP so will be subject to breaking changes.
 
 Change Log
 ==========
-       
+         
+0.0.7
+-----
+
+- client put & put_returning_json functions
+  
 0.0.6
 -----
 

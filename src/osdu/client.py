@@ -106,6 +106,9 @@ class OsduClient:
     def get_returning_json(self, url: str, ok_status_codes: list = None) -> dict:
         """Get data from the specified url in json format.
 
+        To be able to do a conversion to json we typically need a valid http response so
+        pass this in ok_status_codes.
+
         Args:
             url (str): url to GET from to
             ok_status_codes (list, optional): Status codes for successful call. Defaults to [200].
@@ -134,8 +137,6 @@ class OsduClient:
             [requests.Response]: response object
         """
         headers = self.get_headers()
-        # logger.debug(url)
-        # logger.debug(data)
 
         # determine whether to send to requests as data or json
         _json = None
@@ -144,13 +145,15 @@ class OsduClient:
             data = None
 
         response = requests.post(url, data=data, json=_json, headers=headers)
-        # logger.debug(response.text)
         return response
 
     def post_returning_json(
         self, url: str, data: Union[str, dict], ok_status_codes: list = None
     ) -> dict:
         """Post data to the specified url and get the result in json format.
+
+        To be able to do a conversion to json we typically need a valid http response so
+        pass this in ok_status_codes.
 
         Args:
             url (str): url to POST to
@@ -170,21 +173,53 @@ class OsduClient:
             raise HTTPError(response=response)
         return response.json()
 
-    def put(self, url: str, filepath: str) -> requests.Response:
-        """PUT from the file at the given path to a url
+    def put(self, url: str, data: Union[str, dict]) -> requests.Response:
+        """PUT data to the specified url
 
         Args:
-            url (str): url to PUT to
-            filepath (str): path to a file to PUT
+            url (str): url to POST to
+            data (Union[str, dict]): json data as string or dict to send as the body
 
         Returns:
-            requests.Response: response object
+            [requests.Response]: response object
         """
         headers = self.get_headers()
-        headers.update({"Content-Type": "application/octet-stream", "x-ms-blob-type": "BlockBlob"})
-        with open(filepath, "rb") as file_handle:
-            response = requests.put(url, data=file_handle, headers=headers)
-            return response
+
+        # determine whether to send to requests as data or json
+        _json = None
+        if isinstance(data, dict):
+            _json = data
+            data = None
+
+        response = requests.put(url, data=data, json=_json, headers=headers)
+        # logger.debug(response.text)
+        return response
+
+    def put_returning_json(
+        self, url: str, data: Union[str, dict], ok_status_codes: list = None
+    ) -> dict:
+        """Post data to the specified url and get the result in json format.
+
+        To be able to do a conversion to json we typically need a valid http response so
+        pass this in ok_status_codes.
+
+        Args:
+            url (str): url to POST to
+            data (Union[str, dict]): json data as string or dict to send as the body
+            ok_status_codes (list, optional): Status codes indicating successful call. Defaults to [200].
+
+        Raises:
+            HTTPError: Raised if the get returns a status other than those in ok_status_codes
+
+        Returns:
+            dict: response json
+        """
+        if ok_status_codes is None:
+            ok_status_codes = [200]
+        response = self.put(url, data)
+        if response.status_code not in ok_status_codes:
+            raise HTTPError(response=response)
+        return response.json()
 
     def delete(self, url: str, ok_status_codes: list = None) -> requests.Response:
         """GET to a url
