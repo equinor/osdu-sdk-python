@@ -26,19 +26,27 @@ If you want to modify the sdk code then see the [development wiki](https://githu
 
 ## Usage
 
-1. Create an instance of OsduTokenCredential, OsduMsalInteractiveCredential, OsduEnvironmentCredential or your own custom class.
+
+1. Import necessary items
+
+```
+from osdu.client import OsduClient
+from osdu.identity import OsduTokenCredential, OsduMsalInteractiveCredential, OsduEnvironmentCredential
+```
+
+2. Create an instance of OsduTokenCredential, OsduMsalInteractiveCredential, OsduEnvironmentCredential or your own custom class.
 
 ```
 credential = OsduMsalInteractiveCredential(client_id, authority, scopes, token_cache)
 ```
 
-2. Create a client
+3. Create a client
 
 ```
 client = OsduClient(server, partition, credential)
 ```
 
-3. Use the REST interface to call OSDU API's
+4. Use the REST interface to call OSDU API's
 
 ```
 response = client.get(client.server_url + '/api/search/v2/health/readiness_check')

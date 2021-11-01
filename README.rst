@@ -10,7 +10,12 @@ Note: This is currently a WIP so will be subject to breaking changes.
 
 Change Log
 ==========
-         
+                  
+0.0.8
+-----
+
+- search query supports limit
+
 0.0.7
 -----
 

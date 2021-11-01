@@ -114,13 +114,14 @@ class TestSearchClient(TestCase):
 
     # region test query
     @params(
-        ("osdu:wks:dataset--File.Generic:1.0.0", None),
-        ("*:*:*:*", None),
-        (None, None),
-        (None, "opendes:reference-data--ResourceSecurityClassification:RESTRICTED"),
-        ("*:*:*:*", "opendes:reference-data--ResourceSecurityClassification:RESTRICTED"),
+        ("osdu:wks:dataset--File.Generic:1.0.0", None, None),
+        ("*:*:*:*", None, None),
+        (None, None, None),
+        (None, "opendes:reference-data--ResourceSecurityClassification:RESTRICTED", None),
+        (None, "opendes:reference-data--ResourceSecurityClassification:RESTRICTED", 20),
+        ("*:*:*:*", "opendes:reference-data--ResourceSecurityClassification:RESTRICTED", None),
     )
-    def test_query(self, kind, identifier):
+    def test_query(self, kind, identifier, limit):
         """Test the query function"""
         request_data = {}
 
@@ -131,6 +132,9 @@ class TestSearchClient(TestCase):
 
         if identifier is not None:
             request_data["query"] = f'id:("{identifier}")'
+
+        if limit is not None:
+            request_data["limit"] = limit
 
         # request_data = {
         #     "kind": request_kind,
@@ -146,7 +150,7 @@ class TestSearchClient(TestCase):
             client = create_dummy_client()
             search_client = SearchClient(client)
 
-            response_data = search_client.query(kind, identifier)
+            response_data = search_client.query(kind, identifier, limit)
 
             mock_post_returning_json.assert_called_once()
             mock_post_returning_json.assert_called_with(

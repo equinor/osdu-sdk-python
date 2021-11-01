@@ -61,7 +61,7 @@ class SearchClient(ServiceClientBase):
         response_json = self._client.post_returning_json(self.api_url("query"), request_data)
         return response_json
 
-    def query(self, kind: str = None, identifier: str = None) -> dict:
+    def query(self, kind: str = None, identifier: str = None, limit: int = None) -> dict:
         """Query records
 
         Args:
@@ -79,6 +79,9 @@ class SearchClient(ServiceClientBase):
 
         if identifier is not None:
             request_data["query"] = f'id:("{identifier}")'
+
+        if limit is not None:
+            request_data["limit"] = limit
 
         response_json = self._client.post_returning_json(self.api_url("query"), request_data)
         return response_json
