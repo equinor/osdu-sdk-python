@@ -114,14 +114,25 @@ class TestSearchClient(TestCase):
 
     # region test query
     @params(
-        ("osdu:wks:dataset--File.Generic:1.0.0", None, None),
-        ("*:*:*:*", None, None),
-        (None, None, None),
-        (None, "opendes:reference-data--ResourceSecurityClassification:RESTRICTED", None),
-        (None, "opendes:reference-data--ResourceSecurityClassification:RESTRICTED", 20),
-        ("*:*:*:*", "opendes:reference-data--ResourceSecurityClassification:RESTRICTED", None),
+        ("osdu:wks:dataset--File.Generic:1.0.0", None, None, None),
+        ("*:*:*:*", None, None, None),
+        (None, None, None, None),
+        (None, "opendes:reference-data--ResourceSecurityClassification:RESTRICTED", None, None),
+        (None, "opendes:reference-data--ResourceSecurityClassification:RESTRICTED", None, 20),
+        (
+            None,
+            None,
+            'data.WellboreID:("opendes:master-data--Wellbore:ad215042-05db-2b7e-e053-c818a488c79a")',
+            None,
+        ),
+        (
+            "*:*:*:*",
+            "opendes:reference-data--ResourceSecurityClassification:RESTRICTED",
+            None,
+            None,
+        ),
     )
-    def test_query(self, kind, identifier, limit):
+    def test_query(self, kind, identifier, query, limit):
         """Test the query function"""
         request_data = {}
 
@@ -132,6 +143,9 @@ class TestSearchClient(TestCase):
 
         if identifier is not None:
             request_data["query"] = f'id:("{identifier}")'
+
+        if query is not None:
+            request_data["query"] = query
 
         if limit is not None:
             request_data["limit"] = limit
@@ -150,13 +164,21 @@ class TestSearchClient(TestCase):
             client = create_dummy_client()
             search_client = SearchClient(client)
 
-            response_data = search_client.query(kind, identifier, limit)
+            response_data = search_client.query(kind, identifier, query, limit)
 
             mock_post_returning_json.assert_called_once()
             mock_post_returning_json.assert_called_with(
                 "http://www.test.com/api/search/v2/query", request_data
             )
             self.assertEqual(expected_response_data, response_data)
+
+    def test_query_cant_pass_id_and_query(self):
+        """Test query with id and query faile"""
+        with self.assertRaises(ValueError):
+            client = create_dummy_client()
+            search_client = SearchClient(client)
+
+            _ = search_client.query(identifier="id", query="query")
 
     @mock.patch.object(OsduClient, "post_returning_json", side_effect=HTTPError(1))
     def test_query_http_error(self, _):
@@ -170,13 +192,47 @@ class TestSearchClient(TestCase):
     # endregion test query
 
     # region test query_by_id
-    @params("id1", "id")
-    def test_query_by_id(self, identifier):
+    @params(
+        ("id1", None),
+        ("id1", 2),
+        ("id", None),
+        ("id", 2),
+    )
+    def test_query_by_id(self, identifier, limit):
         """Test the query_by_id function"""
         request_data = {
             "kind": "*:*:*:*",
             "query": f'id:("{identifier}")',
         }
+        if limit is not None:
+            request_data["limit"] = limit
+
+        expected_response_data = {
+            "results": [],
+            "totalCount": 1,
+        }
+        with mock.patch(
+            "osdu.client.OsduClient.post_returning_json", return_value=expected_response_data
+        ) as mock_post_returning_json:
+            client = create_dummy_client()
+            search_client = SearchClient(client)
+
+            response_data = search_client.query_by_id(identifier, limit)
+
+            mock_post_returning_json.assert_called_once()
+            mock_post_returning_json.assert_called_with(
+                "http://www.test.com/api/search/v2/query", request_data
+            )
+            self.assertEqual(expected_response_data, response_data)
+
+    @params("id1", "id")
+    def test_query_by_id_defaults(self, identifier):
+        """Test the query_by_id function"""
+        request_data = {
+            "kind": "*:*:*:*",
+            "query": f'id:("{identifier}")',
+        }
+
         expected_response_data = {
             "results": [],
             "totalCount": 1,
@@ -205,6 +261,75 @@ class TestSearchClient(TestCase):
             _ = search_client.query_by_id("id")
 
     # endregion test query_by_id
+
+    # region test query_by_kind
+    @params(
+        ("kind1", None),
+        ("kind1", 2),
+        ("kind", None),
+        ("kind", 2),
+    )
+    def test_query_by_kind(self, kind, limit):
+        """Test the query_by_kind function"""
+        request_data = {
+            "kind": kind,
+        }
+        if limit is not None:
+            request_data["limit"] = limit
+
+        expected_response_data = {
+            "results": [],
+            "totalCount": 1,
+        }
+        with mock.patch(
+            "osdu.client.OsduClient.post_returning_json", return_value=expected_response_data
+        ) as mock_post_returning_json:
+            client = create_dummy_client()
+            search_client = SearchClient(client)
+
+            response_data = search_client.query_by_kind(kind, limit)
+
+            mock_post_returning_json.assert_called_once()
+            mock_post_returning_json.assert_called_with(
+                "http://www.test.com/api/search/v2/query", request_data
+            )
+            self.assertEqual(expected_response_data, response_data)
+
+    @params("kind1", "kind")
+    def test_query_by_kind_defaults(self, kind):
+        """Test the query_by_kind function"""
+        request_data = {
+            "kind": kind,
+        }
+
+        expected_response_data = {
+            "results": [],
+            "totalCount": 1,
+        }
+        with mock.patch(
+            "osdu.client.OsduClient.post_returning_json", return_value=expected_response_data
+        ) as mock_post_returning_json:
+            client = create_dummy_client()
+            search_client = SearchClient(client)
+
+            response_data = search_client.query_by_kind(kind)
+
+            mock_post_returning_json.assert_called_once()
+            mock_post_returning_json.assert_called_with(
+                "http://www.test.com/api/search/v2/query", request_data
+            )
+            self.assertEqual(expected_response_data, response_data)
+
+    @mock.patch.object(OsduClient, "post_returning_json", side_effect=HTTPError(1))
+    def test_query_by_kind_http_error(self, _):
+        """Test query_by_kind http errors are propogated"""
+        with self.assertRaises(HTTPError):
+            client = create_dummy_client()
+            search_client = SearchClient(client)
+
+            _ = search_client.query_by_kind("kind")
+
+    # endregion test query_by_kind
 
 
 if __name__ == "__main__":

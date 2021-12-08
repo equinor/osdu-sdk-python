@@ -61,16 +61,24 @@ class SearchClient(ServiceClientBase):
         response_json = self._client.post_returning_json(self.api_url("query"), request_data)
         return response_json
 
-    def query(self, kind: str = None, identifier: str = None, limit: int = None) -> dict:
+    def query(
+        self, kind: str = None, identifier: str = None, query: str = None, limit: int = None
+    ) -> dict:
         """Query records
 
         Args:
             kind (str): kind to query for
             identifier (str): id to query for
+            query (str): a specific query
+            limit (str): limit on number of records to return
 
         Returns:
             dict: containing the result
         """
+
+        if identifier is not None and query is not None:
+            raise ValueError("You can't specify both identifier and query")
+
         request_data = {}
         if kind is None:
             request_data["kind"] = "*:*:*:*"
@@ -80,13 +88,16 @@ class SearchClient(ServiceClientBase):
         if identifier is not None:
             request_data["query"] = f'id:("{identifier}")'
 
+        if query is not None:
+            request_data["query"] = query
+
         if limit is not None:
             request_data["limit"] = limit
 
         response_json = self._client.post_returning_json(self.api_url("query"), request_data)
         return response_json
 
-    def query_by_id(self, identifier: str) -> dict:
+    def query_by_id(self, identifier: str, limit: int = None) -> dict:
         """Returns a list of all kinds including number of records
 
         Args:
@@ -99,6 +110,26 @@ class SearchClient(ServiceClientBase):
             "kind": "*:*:*:*",
             "query": f'id:("{identifier}")',
         }
+
+        if limit is not None:
+            request_data["limit"] = limit
+
+        response_json = self._client.post_returning_json(self.api_url("query"), request_data)
+        return response_json
+
+    def query_by_kind(self, kind: str, limit: int = None) -> dict:
+        """Returns a list of all records for the given kind
+
+        Args:
+            kind (str): kind to query for
+
+        Returns:
+            dict: containing the result
+        """
+        request_data = {"kind": kind}
+
+        if limit is not None:
+            request_data["limit"] = limit
 
         response_json = self._client.post_returning_json(self.api_url("query"), request_data)
         return response_json

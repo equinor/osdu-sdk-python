@@ -10,7 +10,14 @@ Note: This is currently a WIP so will be subject to breaking changes.
 
 Change Log
 ==========
-                  
+                   
+0.0.9
+-----
+
+- Search query_by_kind function
+- Search query_by_id supports limit
+- Search query supports a specific query
+                   
 0.0.8
 -----
 
