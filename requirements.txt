@@ -10,5 +10,5 @@ pylint==2.9.6
 tox==3.24.1
 testfixtures==6.18.0
 vcrpy==4.1.1
-requests
-msal
+requests==2.26.0
+msal==1.16.0
