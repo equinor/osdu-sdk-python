@@ -187,12 +187,11 @@ class OsduClient:
 
         # determine whether to send to requests as data or json
         _json = None
-        if isinstance(data, dict):
+        if isinstance(data, (dict, list)):
             _json = data
             data = None
 
         response = requests.put(url, data=data, json=_json, headers=headers)
-        # logger.debug(response.text)
         return response
 
     def put_returning_json(
@@ -221,25 +220,17 @@ class OsduClient:
             raise HTTPError(response=response)
         return response.json()
 
-    def delete(self, url: str, ok_status_codes: list = None) -> requests.Response:
+    def delete(self, url: str) -> requests.Response:
         """GET to a url
 
         Args:
             url (str): url to PUT to
-            ok_status_codes (list, optional): Status codes indicating successful call. Defaults to [200].
 
         Returns:
             requests.Response: response object
         """
-        if ok_status_codes is None:
-            ok_status_codes = [200]
-
         headers = self.get_headers()
         response = requests.delete(url, headers=headers)
-
-        if response.status_code not in ok_status_codes:
-            raise HTTPError(response=response)
-
         return response
 
     # endregion HTTP Actions
