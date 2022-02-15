@@ -11,6 +11,12 @@ Note: This is currently a WIP so will be subject to breaking changes.
 Change Log
 ==========
                    
+0.0.10
+------
+
+- Delete doesn't check status codes (consistency with other functions)
+- Put will pass list objects as json
+                   
 0.0.9
 -----
 
