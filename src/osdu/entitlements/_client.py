@@ -64,16 +64,19 @@ class EntitlementsClient(ServiceClientBase):
         response_json = self._client.get_returning_json(self.api_url(f"groups/{group}/members"))
         return response_json
 
-    def add_group(self, group: str) -> dict:
+    def add_group(self, group: str, description: str = None) -> dict:
         """Add a new group
 
         Args:
             group (str): The email of the group.
+            description (str): Optional desctiption for the group.
 
         Returns:
             dict: containing the result
         """
         request_data = {"name": group}
+        if description is not None:
+            request_data["description"] = description
         response_json = self._client.post_returning_json(
             self.api_url("groups"), request_data, [200, 201]
         )

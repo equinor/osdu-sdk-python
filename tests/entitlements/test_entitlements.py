@@ -148,7 +148,7 @@ class TestEntitlementsClient(TestCase):
 
     # region test add_group
     @params("group1@asdf.com", "group2@asdf.com")
-    def test_add_group(self, group):
+    def test_add_group_required_parameters(self, group):
         """Test valid call returns expected values"""
         request_data = {"name": group}
         expected_response_data = {
@@ -163,6 +163,32 @@ class TestEntitlementsClient(TestCase):
             entitlements_client = EntitlementsClient(client)
 
             response_data = entitlements_client.add_group(group)
+
+            mock_post_returning_json.assert_called_once()
+            mock_post_returning_json.assert_called_with(
+                "http://www.test.com/api/entitlements/v2/groups", request_data, [200, 201]
+            )
+            self.assertEqual(expected_response_data, response_data)
+
+    @params(
+        ("group1@asdf.com", "desc"),
+        ("group2@asdf.com", "desc 2"),
+    )
+    def test_add_group_description(self, group, description):
+        """Test valid call returns expected values"""
+        request_data = {"name": group, "description": description}
+        expected_response_data = {
+            "description": description,
+            "name": group,
+            "email": f"{group}@opendes.contoso.com",
+        }
+        with mock.patch(
+            "osdu.client.OsduClient.post_returning_json", return_value=expected_response_data
+        ) as mock_post_returning_json:
+            client = create_dummy_client()
+            entitlements_client = EntitlementsClient(client)
+
+            response_data = entitlements_client.add_group(group, description)
 
             mock_post_returning_json.assert_called_once()
             mock_post_returning_json.assert_called_with(
