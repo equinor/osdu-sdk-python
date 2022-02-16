@@ -30,7 +30,7 @@ EXIT /B 0
 :: define function to launch tests
 :test_func
 echo testing
-nose2 -v --with-coverage --coverage src
+nose2 -v --with-coverage --coverage src --coverage-report term --coverage-report html
 EXIT /B 0
 
 :: format

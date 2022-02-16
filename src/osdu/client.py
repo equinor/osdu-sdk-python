@@ -90,17 +90,22 @@ class OsduClient:
         }
 
     # region HTTP methods
-    def get(self, url: str) -> requests.Response:
+    def get(self, url: str, ok_status_codes: list = None) -> requests.Response:
         """GET from the specified url
 
         Args:
             url (str): url to GET from to
+
+        Raises:
+            HTTPError: Raised if ok_status_codes are passed and the get returns a different status
 
         Returns:
             requests.Response: response object
         """
         headers = self.get_headers()
         response = requests.get(url, headers=headers)
+        if ok_status_codes is not None and response.status_code not in ok_status_codes:
+            raise HTTPError(response=response)
         return response
 
     def get_returning_json(self, url: str, ok_status_codes: list = None) -> dict:
@@ -121,17 +126,20 @@ class OsduClient:
         """
         if ok_status_codes is None:
             ok_status_codes = [200]
-        response = self.get(url)
-        if response.status_code not in ok_status_codes:
-            raise HTTPError(response=response)
+        response = self.get(url, ok_status_codes)
         return response.json()
 
-    def post(self, url: str, data: Union[str, dict]) -> requests.Response:
+    def post(
+        self, url: str, data: Union[str, dict], ok_status_codes: list = None
+    ) -> requests.Response:
         """POST data to the specified url
 
         Args:
             url (str): url to POST to
             data (Union[str, dict]): json data as string or dict to send as the body
+
+        Raises:
+            HTTPError: Raised if ok_status_codes are passed and the post returns a different status
 
         Returns:
             [requests.Response]: response object
@@ -145,6 +153,8 @@ class OsduClient:
             data = None
 
         response = requests.post(url, data=data, json=_json, headers=headers)
+        if ok_status_codes is not None and response.status_code not in ok_status_codes:
+            raise HTTPError(response=response)
         return response
 
     def post_returning_json(
@@ -168,17 +178,20 @@ class OsduClient:
         """
         if ok_status_codes is None:
             ok_status_codes = [200]
-        response = self.post(url, data)
-        if response.status_code not in ok_status_codes:
-            raise HTTPError(response=response)
+        response = self.post(url, data, ok_status_codes)
         return response.json()
 
-    def put(self, url: str, data: Union[str, dict]) -> requests.Response:
+    def put(
+        self, url: str, data: Union[str, dict], ok_status_codes: list = None
+    ) -> requests.Response:
         """PUT data to the specified url
 
         Args:
             url (str): url to POST to
             data (Union[str, dict]): json data as string or dict to send as the body
+
+        Raises:
+            HTTPError: Raised if ok_status_codes are passed and the put returns a different status
 
         Returns:
             [requests.Response]: response object
@@ -192,6 +205,8 @@ class OsduClient:
             data = None
 
         response = requests.put(url, data=data, json=_json, headers=headers)
+        if ok_status_codes is not None and response.status_code not in ok_status_codes:
+            raise HTTPError(response=response)
         return response
 
     def put_returning_json(
@@ -215,22 +230,26 @@ class OsduClient:
         """
         if ok_status_codes is None:
             ok_status_codes = [200]
-        response = self.put(url, data)
-        if response.status_code not in ok_status_codes:
-            raise HTTPError(response=response)
+        response = self.put(url, data, ok_status_codes)
         return response.json()
 
-    def delete(self, url: str) -> requests.Response:
+    def delete(self, url: str, ok_status_codes: list = None) -> requests.Response:
         """GET to a url
 
         Args:
             url (str): url to PUT to
+            ok_status_codes (list, optional): Status codes indicating successful call.
+
+        Raises:
+            HTTPError: Raised if ok_status_codes are passed and the delete returns a different status
 
         Returns:
             requests.Response: response object
         """
         headers = self.get_headers()
         response = requests.delete(url, headers=headers)
+        if ok_status_codes is not None and response.status_code not in ok_status_codes:
+            raise HTTPError(response=response)
         return response
 
     # endregion HTTP Actions

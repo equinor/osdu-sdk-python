@@ -11,6 +11,11 @@ Note: This is currently a WIP so will be subject to breaking changes.
 Change Log
 ==========
                    
+0.0.11
+------
+
+- All client action functions can optional expected response status codes
+                   
 0.0.10
 ------
 
