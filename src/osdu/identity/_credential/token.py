@@ -101,6 +101,7 @@ class OsduTokenCredential(OsduBaseCredential):
             "refresh_token": self._refresh_token,
             "client_id": self._client_id,
             "client_secret": self._client_secret,
+            "scope": "openid email",
         }
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         data = urlencode(body).encode("utf8")
