@@ -57,10 +57,10 @@ def main():
 
     # non-interactive client usage example
 
-    """_app = ConfidentialClientApplication(client_id, client_secret, authority)
-    client = OsduMsalNonInteractiveCredential(client_id, client_secret, authority, scopes, _app)
-
-    print(client.get_token())"""
+    """app = ConfidentialClientApplication(client_id, client_secret, authority)
+    credentials = OsduMsalNonInteractiveCredential(client_id, client_secret, authority, scopes, app)
+    client = OsduClient("https://020.api.osdu.equinor.com", "opendes", credential)
+    client.get("url")"""
 
 
 if __name__ == "__main__":
