@@ -9,8 +9,10 @@
 import json
 from os.path import expanduser
 
+from msal import ConfidentialClientApplication
+
 from osdu.client import OsduClient
-from osdu.identity import OsduMsalInteractiveCredential
+from osdu.identity import OsduMsalInteractiveCredential, OsduMsalNonInteractiveCredential
 from osdu.search import SearchClient
 
 
@@ -21,7 +23,7 @@ def main():
     # See also OsduTokenCredential and OsduEnvironmentCredential for alternatives.
     client_id = "7a414874-4b27-4378-b34f-bc9e5a5faa4f"
     resource_id = "ea31113d-90a2-47bf-befe-26c134b6354d"
-
+    client_secret = ''
     authority = "https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0"
     scopes = f"{resource_id}/.default openid"
     token_cache = expanduser("~/.osdu-example-token-cache")
@@ -52,6 +54,13 @@ def main():
 
     response_json = search_client.query_all_aggregated()
     print(json.dumps(response_json, indent=2))
+
+    # non-interactive client usage example
+
+    """app = ConfidentialClientApplication(client_id, client_secret, authority)
+    credentials = OsduMsalNonInteractiveCredential(client_id, client_secret, authority, scopes, app)
+    client = OsduClient("https://020.api.osdu.equinor.com", "opendes", credential)
+    client.get("url")"""
 
 
 if __name__ == "__main__":
