@@ -57,7 +57,7 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
         return self._token_cache
 
     # pylint: disable=too-many-arguments
-    def __init__(self, client_id: str, authority: str, scopes: str, token_cache: str = None):
+    def __init__(self, client_id: str, authority: str, scopes: str, token_cache: str = None, devicecodeflow:bool=False):
         """Setup the new client
 
         Args:
@@ -71,6 +71,7 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
         self._authority = authority
         self._scopes = scopes
         self._token_cache = token_cache
+        self._devicecodeflow = devicecodeflow
 
     def get_token(self, **kwargs) -> str:
         """
@@ -99,10 +100,11 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
         )
 
         result = None
-
+        scopes = [self._scopes]
         # Firstly, check the cache to see if this end user has signed in before
         # accounts = app.get_accounts(username=config.get("username"))
         accounts = app.get_accounts()
+
         if accounts:
             logger.debug("Account(s) exists in cache, probably with token too. Let's try.")
             # for a in accounts:
@@ -111,23 +113,30 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
                 0
             ]  # Assuming the end user chose this one to proceed - should change if multiple
             # Now let's try to find a token in cache for this account
-            result = app.acquire_token_silent([self._scopes], account=chosen)
+            result = app.acquire_token_silent(scopes, account=chosen)
 
         if not result:
             logger.debug("No suitable token exists in cache. Let's get a new one from AAD.")
-            print("A local browser window will be open for you to sign in. CTRL+C to cancel.")
-            result = app.acquire_token_interactive(
-                [self._scopes],
-                timeout=10,
-                # login_hint=config.get("username"),  # Optional.
-                # If you know the username ahead of time, this parameter can pre-fill
-                # the username (or email address) field of the sign-in page for the user,
-                # Often, apps use this parameter during reauthentication,
-                # after already extracting the username from an earlier sign-in
-                # by using the preferred_username claim from returned id_token_claims.
-                # Or simply "select_account" as below - Optional. It forces to show account selector page
-                prompt=msal.Prompt.SELECT_ACCOUNT,
-            )
+
+            if self._devicecodeflow is False:
+                print("A local browser window will be open for you to sign in. CTRL+C to cancel.")
+                result = app.acquire_token_interactive(
+                    [self._scopes],
+                    timeout=10,
+                    # login_hint=config.get("username"),  # Optional.
+                    # If you know the username ahead of time, this parameter can pre-fill
+                    # the username (or email address) field of the sign-in page for the user,
+                    # Often, apps use this parameter during reauthentication,
+                    # after already extracting the username from an earlier sign-in
+                    # by using the preferred_username claim from returned id_token_claims.
+                    # Or simply "select_account" as below - Optional. It forces to show account selector page
+                    prompt=msal.Prompt.SELECT_ACCOUNT,
+                )
+            else:
+                print("device code flow")
+                flow = app.initiate_device_flow(scopes=scopes)
+                print(f'Visit https://microsoft.com/devicelogin and enter {flow["user_code"]}')
+                result = app.acquire_token_by_device_flow(flow)
 
             if cache.has_state_changed:
                 with open(self.token_cache, "w", encoding="utf8") as cachefile:
