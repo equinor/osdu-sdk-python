@@ -7,13 +7,15 @@
 
 import logging
 import os
+from abc import abstractmethod
+import msal
 
 from .base import OsduBaseCredential
 
 logger = logging.getLogger(__name__)
 
 
-class OsduMsalInteractiveCredential(OsduBaseCredential):
+class OsduMsalInteractiveCredentialBase(OsduBaseCredential):
     """Refresh token based client for connecting with OSDU."""
 
     # __access_token_expire_date = None
@@ -57,7 +59,8 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
         return self._token_cache
 
     # pylint: disable=too-many-arguments
-    def __init__(self, client_id: str, authority: str, scopes: str, token_cache: str = None, devicecodeflow:bool=False):
+    def __init__(
+            self, client_id: str, authority: str, scopes: str, token_cache: str = None):
         """Setup the new client
 
         Args:
@@ -71,7 +74,6 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
         self._authority = authority
         self._scopes = scopes
         self._token_cache = token_cache
-        self._devicecodeflow = devicecodeflow
 
     def get_token(self, **kwargs) -> str:
         """
@@ -81,13 +83,25 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
         self.refresh_access_token()
         return self.__access_token
 
+    @abstractmethod
+    def _auth_flow(self, app) -> dict:
+        """Interactive flow for getting token. Auth code flow or device code flow
+
+        Parameters
+        ----------
+        app : msal.PublicClientApplication
+
+        Returns
+        -------
+        dict: Dictionary representing the returned token
+        """
+
     def _refresh_access_token(self) -> dict:
         """Refresh token using msal.
 
         Returns:
             dict: Dictionary representing the returned token
         """
-        import msal
 
         # Create a preferably long-lived app instance which maintains a persistant token cache.
         cache = msal.SerializableTokenCache()
@@ -100,7 +114,6 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
         )
 
         result = None
-        scopes = [self._scopes]
         # Firstly, check the cache to see if this end user has signed in before
         # accounts = app.get_accounts(username=config.get("username"))
         accounts = app.get_accounts()
@@ -113,30 +126,13 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
                 0
             ]  # Assuming the end user chose this one to proceed - should change if multiple
             # Now let's try to find a token in cache for this account
-            result = app.acquire_token_silent(scopes, account=chosen)
+            result = app.acquire_token_silent([self._scopes], account=chosen)
 
         if not result:
             logger.debug("No suitable token exists in cache. Let's get a new one from AAD.")
 
-            if self._devicecodeflow is False:
-                print("A local browser window will be open for you to sign in. CTRL+C to cancel.")
-                result = app.acquire_token_interactive(
-                    [self._scopes],
-                    timeout=10,
-                    # login_hint=config.get("username"),  # Optional.
-                    # If you know the username ahead of time, this parameter can pre-fill
-                    # the username (or email address) field of the sign-in page for the user,
-                    # Often, apps use this parameter during reauthentication,
-                    # after already extracting the username from an earlier sign-in
-                    # by using the preferred_username claim from returned id_token_claims.
-                    # Or simply "select_account" as below - Optional. It forces to show account selector page
-                    prompt=msal.Prompt.SELECT_ACCOUNT,
-                )
-            else:
-                print("device code flow")
-                flow = app.initiate_device_flow(scopes=scopes)
-                print(f'Visit https://microsoft.com/devicelogin and enter {flow["user_code"]}')
-                result = app.acquire_token_by_device_flow(flow)
+            print("A local browser window will be open for you to sign in. CTRL+C to cancel.")
+            result = self._auth_flow(app)
 
             if cache.has_state_changed:
                 with open(self.token_cache, "w", encoding="utf8") as cachefile:
@@ -178,3 +174,33 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
             print(result.get("correlation_id"))
 
         return result  # You may need this when reporting a bug
+
+
+class OsduMsalInteractiveCredential(OsduMsalInteractiveCredentialBase):
+    """Refresh token based client for connecting with OSDU."""
+
+    def _auth_flow(self, app) -> dict:
+        return app.acquire_token_interactive(
+            [self._scopes],
+            timeout=10,
+            # login_hint=config.get("username"),  # Optional.
+            # If you know the username ahead of time, this parameter can pre-fill
+            # the username (or email address) field of the sign-in page for the user,
+            # Often, apps use this parameter during reauthentication,
+            # after already extracting the username from an earlier sign-in
+            # by using the preferred_username claim from returned id_token_claims.
+            # Or simply "select_account" as below - Optional. It forces to show account selector page
+            prompt=msal.Prompt.SELECT_ACCOUNT,
+        )
+
+
+class OsduMsalDeviceCode(OsduMsalInteractiveCredentialBase):
+    """Refresh token based client for connecting with OSDU."""
+
+    def _auth_flow(self, app) -> dict:
+        print("device code flow")
+        flow = app.initiate_device_flow(scopes=[self._scopes])
+        if "user_code" not in flow:
+            print("Failed to get user code for device code flow")
+        print(f'Visit https://microsoft.com/devicelogin and enter {flow["user_code"]}')
+        return app.acquire_token_by_device_flow(flow)

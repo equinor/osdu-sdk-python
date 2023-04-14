@@ -10,6 +10,7 @@ from ._credential import (
     OsduMsalInteractiveCredential,
     OsduMsalNonInteractiveCredential,
     OsduTokenCredential,
+    OsduMsalDeviceCode,
 )
 
 __all__ = [
@@ -17,5 +18,6 @@ __all__ = [
     "OsduEnvironmentCredential",
     "OsduTokenCredential",
     "OsduMsalInteractiveCredential",
-    "OsduMsalNonInteractiveCredential"
+    "OsduMsalNonInteractiveCredential",
+    "OsduMsalDeviceCode"
 ]
