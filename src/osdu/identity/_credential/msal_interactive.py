@@ -177,7 +177,7 @@ class OsduMsalInteractiveCredentialBase(OsduBaseCredential):
 
 
 class OsduMsalInteractiveCredential(OsduMsalInteractiveCredentialBase):
-    """Refresh token based client for connecting with OSDU."""
+    """MSAL Interactive Auth code flow."""
 
     def _auth_flow(self, app) -> dict:
         return app.acquire_token_interactive(
@@ -195,7 +195,7 @@ class OsduMsalInteractiveCredential(OsduMsalInteractiveCredentialBase):
 
 
 class OsduMsalDeviceCode(OsduMsalInteractiveCredentialBase):
-    """Refresh token based client for connecting with OSDU."""
+    """MSAL Interactive device code flow."""
 
     def _auth_flow(self, app) -> dict:
         print("device code flow")
