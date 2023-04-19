@@ -6,7 +6,7 @@
 # pylint: disable=C0114
 from .base import OsduBaseCredential
 from .environment import OsduEnvironmentCredential
-from .msal_interactive import OsduMsalInteractiveCredential,OsduMsalDeviceCode
+from .msal_interactive import OsduMsalInteractiveCredential, OsduMsalDeviceCode, OsduMsalOnBehalfOf
 from .msal_non_interactive import OsduMsalNonInteractiveCredential
 from .token import OsduTokenCredential
 
@@ -16,5 +16,6 @@ __all__ = [
     "OsduTokenCredential",
     "OsduMsalInteractiveCredential",
     "OsduMsalNonInteractiveCredential",
-    "OsduMsalDeviceCode"
+    "OsduMsalDeviceCode",
+    "OsduMsalOnBehalfOf"
 ]

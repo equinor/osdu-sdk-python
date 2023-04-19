@@ -38,7 +38,18 @@ from osdu.identity import OsduTokenCredential, OsduMsalInteractiveCredential, Os
 
 ```
 credential = OsduMsalInteractiveCredential(client_id, authority, scopes, token_cache)
+
 ```
+On-behalf-of flow using a middle-tier service principal
+
+```python
+from osdu.identity import OsduMsalOnBehalfOf, OsduMsalDeviceCode
+interactive_client = OsduMsalDeviceCode(<CLIENT_ID>,"https://login.microsoftonline.com/{TENANT_ID}","{CLIENT_ID}/.default","./cache")
+obo_client = OsduMsalOnBehalfOf(interactive_client,<CLIENT_SECRET>,<OSDU_RESOURCE_ID>)
+obo_client.get_token()
+
+```
+
 
 3. Create a client
 
