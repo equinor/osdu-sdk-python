@@ -53,7 +53,7 @@ class OsduMsalNonInteractiveCredential(OsduBaseCredential):
         return self._scopes
 
     @property
-    def msal_confidential_client(self) -> object:
+    def msal_confidential_client(self) -> ConfidentialClientApplication:
         """The current scopes requested
 
         Returns:
