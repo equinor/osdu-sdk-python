@@ -9,8 +9,10 @@ import logging
 import os
 from abc import abstractmethod
 import msal
+import requests
 
 from .base import OsduBaseCredential
+
 
 logger = logging.getLogger(__name__)
 
@@ -199,8 +201,51 @@ class OsduMsalDeviceCode(OsduMsalInteractiveCredentialBase):
 
     def _auth_flow(self, app) -> dict:
         print("device code flow")
+        print(self._scopes)
         flow = app.initiate_device_flow(scopes=[self._scopes])
         if "user_code" not in flow:
             print("Failed to get user code for device code flow")
+            print(flow)
         print(f'Visit https://microsoft.com/devicelogin and enter {flow["user_code"]}')
         return app.acquire_token_by_device_flow(flow)
+
+
+class OsduMsalOnBehalfOf(OsduBaseCredential):
+    # pylint: disable=too-many-arguments
+    def __init__(
+            self, interactive_client: OsduMsalInteractiveCredential | OsduMsalDeviceCode,
+            client_secret: str, osdu_resource_id: str):
+        """Setup the new client
+
+        Args:
+            client_id (str): client id for connecting
+            authority (str): authority url
+            scopes (str): scopes to request
+            token_cache (str): path to persist tokens to
+        """
+        super().__init__()
+        self._interactive_client = interactive_client
+        self._client_secret = client_secret
+        self._osdu_resource_id = osdu_resource_id
+
+    @property
+    def _user_impersonation_scope(self) -> str:
+        return f"api://{self._osdu_resource_id}/user_impersonation"
+
+    def _get_middle_tier_token(self) -> str:
+        return self._interactive_client.get_token()
+
+    def get_token(self, **kwargs) -> str:
+        conf = {
+            "grant_type": 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            "assertion": self._get_middle_tier_token(),
+            "client_id": self._interactive_client.client_id,
+            "client_secret": self._client_secret,
+            "resource": self._osdu_resource_id,
+            "requested_token_use": 'on_behalf_of',
+            "scope": 'openid user_impersonation'
+        }
+        res = requests.post(f"{self._interactive_client.authority}/oauth2/token", conf)
+        if res.status_code != 200:
+            print(res.text)
+        return res.json()["access_token"]
