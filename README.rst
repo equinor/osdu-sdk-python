@@ -10,7 +10,17 @@ Note: This is currently a WIP so will be subject to breaking changes.
 
 Change Log
 ==========
-                   
+
+0.0.14
+------
+
+- Fix for msal non-interactive authentication
+
+0.0.13
+------
+
+- Add support for non-interactive authentication
+
 0.0.12
 ------
 
