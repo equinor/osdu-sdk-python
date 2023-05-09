@@ -11,10 +11,11 @@ Note: This is currently a WIP so will be subject to breaking changes.
 Change Log
 ==========
 
-0.0.14
+0.0.15
 ------
 
 - Fix for msal non-interactive authentication
+- Add on-behalf-of flow
 
 0.0.13
 ------
