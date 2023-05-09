@@ -96,5 +96,6 @@ class OsduMsalNonInteractiveCredential(OsduBaseCredential):
             dict: Dictionary representing the returned token
         """
         result = self._msal_confidential_client.acquire_token_silent([self._scopes], account=None)
-        if not result:
-            return self._msal_confidential_client.acquire_token_for_client([self._scopes])
+        if result:
+            return result
+        return self._msal_confidential_client.acquire_token_for_client([self._scopes])
