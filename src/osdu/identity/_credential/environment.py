@@ -38,7 +38,6 @@ class OsduEnvironmentCredential(OsduBaseCredential):
     If a prefix is specified then this is prepended to the above names.
     """
 
-    # pylint: disable=too-many-arguments
     def __init__(self, prefix=None, **kwargs):
         """Setup the new credential based upon environment variables.
 

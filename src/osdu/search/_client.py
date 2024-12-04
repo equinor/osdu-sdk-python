@@ -13,7 +13,6 @@ from osdu.serviceclientbase import ServiceClientBase
 VALID_SEARCH_API_VERSIONS = [2]
 
 
-# pylint: disable=too-few-public-methods
 class SearchClient(ServiceClientBase):
     # Dev. notes:
     # inspiration from:
@@ -24,7 +23,7 @@ class SearchClient(ServiceClientBase):
     # TO DO Cursor / paging support.
     """A client for working with the OSDU Search API."""
 
-    def __init__(self, client: OsduClient, service_version: Union[int, str] = "latest"):
+    def __init__(self, client: OsduClient, service_version: Union[int, str] = "latest"):  # noqa:E501 pylint: disable=consider-alternative-union-syntax
         """Setup the SearchClient
 
         Args:
@@ -102,6 +101,7 @@ class SearchClient(ServiceClientBase):
 
         Args:
             identifier (str): id to query for
+            limit (int): limit on number of records to return
 
         Returns:
             dict: containing the result
@@ -122,6 +122,7 @@ class SearchClient(ServiceClientBase):
 
         Args:
             kind (str): kind to query for
+            limit (int): limit on number of records to return
 
         Returns:
             dict: containing the result

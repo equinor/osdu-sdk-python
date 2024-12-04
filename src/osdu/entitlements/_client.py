@@ -16,7 +16,7 @@ VALID_ENTITLEMENTS_API_VERSIONS = [2]
 class EntitlementsClient(ServiceClientBase):
     """A client for working with the OSDU Entitlements API."""
 
-    def __init__(self, client: OsduClient, service_version: Union[int, str] = "latest"):
+    def __init__(self, client: OsduClient, service_version: Union[int, str] = "latest"):  # noqa: E501 pylint: disable=consider-alternative-union-syntax
         """Setup the EntitlementsClient
 
         Args:

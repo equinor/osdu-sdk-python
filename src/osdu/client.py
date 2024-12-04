@@ -95,6 +95,7 @@ class OsduClient:
 
         Args:
             url (str): url to GET from to
+            ok_status_codes (list): [description]
 
         Raises:
             HTTPError: Raised if ok_status_codes are passed and the get returns a different status
@@ -103,7 +104,7 @@ class OsduClient:
             requests.Response: response object
         """
         headers = self.get_headers()
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers)  # pylint: disable=missing-timeout
         if ok_status_codes is not None and response.status_code not in ok_status_codes:
             raise HTTPError(response=response)
         return response
@@ -130,13 +131,14 @@ class OsduClient:
         return response.json()
 
     def post(
-        self, url: str, data: Union[str, dict], ok_status_codes: list = None
+        self, url: str, data: Union[str, dict], ok_status_codes: list = None  # noqa: E501 pylint: disable=consider-alternative-union-syntax
     ) -> requests.Response:
         """POST data to the specified url
 
         Args:
             url (str): url to POST to
             data (Union[str, dict]): json data as string or dict to send as the body
+            ok_status_codes (list): [description]
 
         Raises:
             HTTPError: Raised if ok_status_codes are passed and the post returns a different status
@@ -152,13 +154,13 @@ class OsduClient:
             _json = data
             data = None
 
-        response = requests.post(url, data=data, json=_json, headers=headers)
+        response = requests.post(url, data=data, json=_json, headers=headers)  # pylint: disable=missing-timeout
         if ok_status_codes is not None and response.status_code not in ok_status_codes:
             raise HTTPError(response=response)
         return response
 
     def post_returning_json(
-        self, url: str, data: Union[str, dict], ok_status_codes: list = None
+        self, url: str, data: Union[str, dict], ok_status_codes: list = None  # noqa: E501 pylint: disable=consider-alternative-union-syntax
     ) -> dict:
         """Post data to the specified url and get the result in json format.
 
@@ -182,13 +184,14 @@ class OsduClient:
         return response.json()
 
     def put(
-        self, url: str, data: Union[str, dict], ok_status_codes: list = None
+        self, url: str, data: Union[str, dict], ok_status_codes: list = None  # noqa: E501 pylint: disable=consider-alternative-union-syntax
     ) -> requests.Response:
         """PUT data to the specified url
 
         Args:
             url (str): url to POST to
             data (Union[str, dict]): json data as string or dict to send as the body
+            ok_status_codes (list): [description]
 
         Raises:
             HTTPError: Raised if ok_status_codes are passed and the put returns a different status
@@ -204,13 +207,13 @@ class OsduClient:
             _json = data
             data = None
 
-        response = requests.put(url, data=data, json=_json, headers=headers)
+        response = requests.put(url, data=data, json=_json, headers=headers)  # pylint: disable=missing-timeout
         if ok_status_codes is not None and response.status_code not in ok_status_codes:
             raise HTTPError(response=response)
         return response
 
     def put_returning_json(
-        self, url: str, data: Union[str, dict], ok_status_codes: list = None
+        self, url: str, data: Union[str, dict], ok_status_codes: list = None  # noqa: E501 pylint: disable=consider-alternative-union-syntax
     ) -> dict:
         """Post data to the specified url and get the result in json format.
 
@@ -247,7 +250,7 @@ class OsduClient:
             requests.Response: response object
         """
         headers = self.get_headers()
-        response = requests.delete(url, headers=headers)
+        response = requests.delete(url, headers=headers)  # pylint: disable=missing-timeout
         if ok_status_codes is not None and response.status_code not in ok_status_codes:
             raise HTTPError(response=response)
         return response

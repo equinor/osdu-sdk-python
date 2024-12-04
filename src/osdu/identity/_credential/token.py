@@ -60,7 +60,6 @@ class OsduTokenCredential(OsduBaseCredential):
         """
         return self._client_secret
 
-    # pylint: disable=too-many-arguments
     def __init__(
         self,
         client_id: str,
