@@ -59,7 +59,7 @@ def main():
         )
         print("\n".join(files_without_header), file=sys.stderr)
         print(
-            "Error: {} file(s) found without license headers.".format(len(files_without_header)),
+            f"Error: {len(files_without_header)} file(s) found without license headers.",
             file=sys.stderr,
         )
         sys.exit(1)
