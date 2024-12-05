@@ -27,8 +27,8 @@ classifiers = [
 keywords = ["osdu-sdk"]
 
 dependencies = [
-    "requests",
-    "msal"
+    "requests==2.31.0",
+    "msal==1.31.1"
 ]
 
 [project.urls]
