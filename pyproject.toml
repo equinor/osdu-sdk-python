@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "osdu-sdk"
+dynamic = ["version", "readme"]
+description = "OSDU SDK for Python"
+license = { text = "MIT" }
+requires-python = ">= 3.12"
+
+authors = [
+    { name = "Equinor ASA", email = "mhew@equinor.com" }
+]
+
+classifiers = [
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "Topic :: Software Development :: Build Tools",
+        "Environment :: Console",
+        "License :: OSI Approved :: MIT License",
+        "Natural Language :: English",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+]
+
+keywords = ["osdu-sdk"]
+
+dependencies = [
+    "requests==2.31.0",
+    "msal==1.31.1"
+]
+
+[project.urls]
+homepage = "https://github.com/equinor/osdu-sdk-python"
+issue-tracker = "https://github.com/equinor/osdu-sdk-python/issues"
+
+[project.optional-dependencies]
+dev = [
+    # formatting
+    "black",
+    "isort",
+    # linting
+    "flake8",
+    "pep8",
+    "autopep8",
+    "pylint",
+    # testing
+    "mock",
+    "nose2[coverage-plugin]",
+    "testfixtures",
+    "vcrpy",
+    # other frameworks
+    #"knack",
+    "setuptools",
+    "tox",
+    "docutils"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools]
+py-modules = ["osdu"]
+
+[tool.setuptools.dynamic]
+version = {attr = "osdu.__VERSION__"}
+readme = {file = "README.rst"}
+
+[tool.nose2]
+unittest = { test-file-pattern = "*test*.py", start-dir = "tests" }

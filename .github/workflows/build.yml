@@ -19,9 +19,8 @@ jobs:
           - 'macos-latest'
           - 'windows-latest'      
         python-version: 
-          - '3.8'
-          - '3.9'
-          - '3.10'
+          - '3.12'
+          - '3.13'
 
     steps:
     - uses: actions/checkout@v2
@@ -35,11 +34,12 @@ jobs:
     - name: Install
       run: |
         # Upgrade pip
+        python -V
         python -m pip install --upgrade pip
         # Install the package
         pip install --force-reinstall -e .
         # Development dependencies
-        pip install --force-reinstall -r requirements.txt
+        pip install --force-reinstall .[dev]
         # Install additional GitHub actions build dependencies
         pip install tox-gh-actions setuptools wheel twine
     

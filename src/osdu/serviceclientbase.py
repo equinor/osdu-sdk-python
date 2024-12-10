@@ -48,7 +48,7 @@ class ServiceClientBase:
         client: OsduClient,
         service_name: str,
         valid_service_versions: list,
-        service_version: Union[int, str] = "latest",
+        service_version: Union[int, str] = "latest",  # pylint: disable=consider-alternative-union-syntax
     ):
         """Setup the ServiceClientBase
 

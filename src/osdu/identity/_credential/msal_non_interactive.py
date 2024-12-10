@@ -7,8 +7,8 @@
 
 import logging
 
-from .base import OsduBaseCredential
 from msal import ConfidentialClientApplication
+from .base import OsduBaseCredential
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +81,7 @@ class OsduMsalNonInteractiveCredential(OsduBaseCredential):
         self._authority = authority
         self._scopes = scopes
 
-    def get_token(self, **kwargs) -> str:
+    def get_token(self, **kwargs) -> str:   # pylint: disable=inconsistent-return-statements
         """
         return access_token.
         """

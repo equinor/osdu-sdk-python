@@ -8,6 +8,8 @@
 import logging
 import os
 
+import msal
+
 from .base import OsduBaseCredential
 
 logger = logging.getLogger(__name__)
@@ -56,7 +58,6 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
         """
         return self._token_cache
 
-    # pylint: disable=too-many-arguments
     def __init__(self, client_id: str, authority: str, scopes: str, token_cache: str = None):
         """Setup the new client
 
@@ -86,7 +87,6 @@ class OsduMsalInteractiveCredential(OsduBaseCredential):
         Returns:
             dict: Dictionary representing the returned token
         """
-        import msal
 
         # Create a preferably long-lived app instance which maintains a persistant token cache.
         cache = msal.SerializableTokenCache()
