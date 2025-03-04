@@ -6,6 +6,20 @@
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/osdu-sdk.svg?color=informational)](https://pypi.org/project/osdu-sdk/)
 ![Unknown coverage](https://img.shields.io/badge/coverage-%3F%3F%3F-important)
 
+
+<br>
+<br>
+<br>
+<br>
+
+--------------
+
+> This SDK has to a large degree been used as the backend for the [OSDU-CLI](https://community.opengroup.org/osdu/ui/data-loading/osdu-cli). Since version 0.0.42 of the OSDU-CLI it has transitioned to use the [Python SDK](https://community.opengroup.org/osdu/platform/system/sdks/common-python-sdk) from the OSDU Forum. This repo will be depreciated and finally archived.
+
+
+--------
+
+
 This is the OSDU SDK for Python (work in progress).
 
 :warning: Note that this is a work in progress and is not complete / might contain bugs and might be subject to breaking changes.
